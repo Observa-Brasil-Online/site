@@ -1,0 +1,56 @@
+---
+import '../styles/base.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE } from '../config';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Caminho da imagem de compartilhamento, relativo à raiz do site */
+  ogImage?: string;
+}
+
+const { title, description = SITE.description, ogImage = '/og-default.png' } = Astro.props;
+
+const fullTitle = title === SITE.name ? `${SITE.name} — ${SITE.endorsement}` : `${title} — ${SITE.name}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogUrl = new URL(ogImage, Astro.site);
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- As duas famílias são servidas localmente; pré-carregar as usadas acima da dobra -->
+    <link rel="preload" href="/fonts/Archivo-800.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/IBMPlex-Mono-500.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <Header />
+    <main id="conteudo">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

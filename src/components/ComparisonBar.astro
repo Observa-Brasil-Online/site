@@ -1,0 +1,79 @@
+---
+/**
+ * ComparisonBar — a barra oficial Esquerda × Direita.
+ *
+ * Regra do manual, não preferência: Esquerda = Azul OBSERVA, Direita = Âmbar,
+ * sempre nessa ordem, nunca invertida. Os dois campos recebem o mesmo espaço
+ * de rótulo e o mesmo vocabulário.
+ */
+interface Props {
+  leftLabel?: string;
+  leftValue: number;
+  rightLabel?: string;
+  rightValue: number;
+  /** Descreve o que a barra mede, para leitores de tela */
+  caption: string;
+}
+
+const {
+  leftLabel = 'Esquerda',
+  leftValue,
+  rightLabel = 'Direita',
+  rightValue,
+  caption,
+} = Astro.props;
+
+const total = leftValue + rightValue;
+const leftPct = total ? (leftValue / total) * 100 : 50;
+
+const fmt = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+---
+
+<figure class="cmp">
+  <figcaption class="labels">
+    <span class="tabular">{leftLabel} · {fmt(leftValue)}%</span>
+    <span class="tabular">{fmt(rightValue)}% · {rightLabel}</span>
+  </figcaption>
+  <div class="track" role="img" aria-label={`${caption}: ${leftLabel} ${fmt(leftValue)}%, ${rightLabel} ${fmt(rightValue)}%`}>
+    <div class="left" style={`width:${leftPct}%`}></div>
+    <div class="right" style={`width:${100 - leftPct}%`}></div>
+  </div>
+</figure>
+
+<style>
+  .cmp {
+    margin: 0;
+    width: 100%;
+  }
+
+  .labels {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: 0.688rem;
+    font-weight: 500;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+
+  .track {
+    display: flex;
+    width: 100%;
+    height: 20px;
+    /* contorno navy obrigatório por causa do fill âmbar */
+    border: var(--border-amber-outline) solid var(--navy);
+  }
+
+  .left { background: var(--data-left); }
+  .right { background: var(--data-right); }
+
+  :global(.band-dark) .labels {
+    color: var(--sky-blue);
+  }
+  :global(.band-dark) .track {
+    border-color: var(--cream);
+  }
+</style>

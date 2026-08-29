@@ -1,0 +1,88 @@
+---
+import SignatureLockup from './SignatureLockup.astro';
+import { NAV } from '../config';
+
+const path = Astro.url.pathname.replace(/\.html$/, '') || '/';
+const isCurrent = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+---
+
+<header class="site-header">
+  <div class="container inner">
+    <SignatureLockup asLink />
+    <nav aria-label="Navegação principal">
+      <ul>
+        {
+          NAV.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={['nav-link', { current: isCurrent(item.href) }]}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background: var(--cream);
+    border-bottom: var(--border-thin) solid var(--mist-gray);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-6);
+    padding-block: var(--space-4);
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: var(--type-label-size);
+    font-weight: 400;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+    color: var(--graphite);
+    text-decoration: none;
+    padding-block: var(--space-1);
+    border-bottom: 2px solid transparent;
+    transition: opacity var(--ease);
+  }
+
+  .nav-link:hover {
+    opacity: 0.7;
+  }
+
+  .nav-link.current {
+    font-weight: 500;
+    color: var(--navy);
+    border-bottom-color: var(--amber);
+  }
+
+  @media (max-width: 560px) {
+    .inner {
+      justify-content: flex-start;
+    }
+    ul {
+      gap: var(--space-5);
+    }
+  }
+</style>

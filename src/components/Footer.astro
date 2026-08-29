@@ -1,0 +1,81 @@
+---
+import Symbol from './Symbol.astro';
+import { SITE, AMOSTRA } from '../config';
+
+const year = new Date().getFullYear();
+
+// "X (Twitter), Instagram e TikTok" — lista com "e" antes do último item
+const plataformas = new Intl.ListFormat('pt-BR', { style: 'long', type: 'conjunction' }).format(
+  AMOSTRA.plataformas
+);
+---
+
+<footer class="site-footer band-dark">
+  <div class="container inner">
+    <Symbol variant="negative" size={44} />
+
+    <p class="signature mono">
+      {SITE.endorsement} · {SITE.institution} · {SITE.university}
+    </p>
+
+    <p class="scope">
+      A série mede o debate entre {AMOSTRA.perfis} perfis monitorados de lideranças
+      políticas, influenciadores e jornalistas em {plataformas}.
+      Não é uma medida da opinião pública brasileira.
+    </p>
+
+    <p class="contact mono">
+      <a href={`mailto:${SITE.contact}`}>{SITE.contact}</a>
+      <span aria-hidden="true">·</span>
+      <span>{year}</span>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-9);
+    padding-block: var(--space-7);
+  }
+
+  .inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  .signature {
+    color: var(--sky-blue);
+    margin: 0;
+  }
+
+  .scope {
+    max-width: 60ch;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--cream);
+    opacity: 0.82;
+  }
+
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--sky-blue);
+  }
+
+  .contact a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+  }
+
+  .contact a:hover {
+    opacity: 0.8;
+  }
+</style>

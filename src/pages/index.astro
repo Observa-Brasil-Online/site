@@ -1,0 +1,164 @@
+---
+import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+import Badge from '../components/Badge.astro';
+import Card from '../components/Card.astro';
+import { SITE, AMOSTRA } from '../config';
+
+// Copy verbatim do carrossel "Quem Somos" já publicado — não reescrever.
+const camadas = [
+  {
+    n: '01',
+    titulo: 'Coleta',
+    texto:
+      'Publicações e interações de perfis de lideranças políticas, influenciadores e jornalistas de destaque no debate público.',
+  },
+  {
+    n: '02',
+    titulo: 'Indicadores quantitativos',
+    texto:
+      'Volume de publicações, interações e engajamento médio por post — por campo e por plataforma.',
+  },
+  {
+    n: '03',
+    titulo: 'Leitura qualitativa',
+    texto:
+      'Identificação dos principais conflitos discursivos do período — os temas em torno dos quais a disputa se organiza.',
+  },
+];
+---
+
+<Base title={SITE.name}>
+  <section class="hero band-dark">
+    <div class="container hero-inner">
+      <span class="mono kicker">OBSERVA · Eleições 2026</span>
+      <h1>A eleição de 2026 também acontece no feed.</h1>
+      <p class="lede">E alguém está medindo — semana a semana, até outubro.</p>
+      <div class="actions">
+        <Button variant="amber" href="/relatorios">Ver os relatórios</Button>
+        <Button variant="ghost-dark" href="/quem-somos">Como funciona</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="metodo band-block">
+    <div class="container">
+      <span class="mono eyebrow">Como funciona</span>
+      <h2>Três camadas.</h2>
+      <div class="camadas">
+        {
+          camadas.map((c) => (
+            <Card surface="cream">
+              <span class="mono num">{c.n}</span>
+              <h3>{c.titulo}</h3>
+              <p>{c.texto}</p>
+            </Card>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="recorte">
+    <div class="container recorte-inner">
+      <div class="plataformas">
+        {AMOSTRA.plataformas.map((p) => <Badge tone="cream">{p}</Badge>)}
+      </div>
+      <span class="mono tabular perfis">{AMOSTRA.perfis} perfis monitorados</span>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- hero ---------- */
+  .hero {
+    padding-block: var(--space-9) var(--space-8);
+  }
+
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    align-items: flex-start;
+  }
+
+  .kicker {
+    color: var(--sky-blue);
+  }
+
+  .hero h1 {
+    max-width: 16ch;
+  }
+
+  .lede {
+    font-size: var(--type-subtitle-size);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--sky-blue);
+    max-width: 44ch;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  /* ---------- método ---------- */
+  .metodo {
+    padding-block: var(--space-8);
+  }
+
+  .eyebrow {
+    display: block;
+    color: var(--amber-dark);
+    margin-bottom: var(--space-3);
+  }
+
+  .camadas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+  }
+
+  .num {
+    display: block;
+    color: var(--amber-dark);
+    margin-bottom: var(--space-2);
+  }
+
+  .camadas h3 {
+    font-size: 1.0625rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .camadas p {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  /* ---------- recorte ---------- */
+  .recorte {
+    padding-block: var(--space-7);
+  }
+
+  .recorte-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .plataformas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .perfis {
+    color: var(--graphite);
+  }
+</style>

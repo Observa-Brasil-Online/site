@@ -1,0 +1,82 @@
+---
+import Symbol from './Symbol.astro';
+
+/**
+ * Assinatura OBSERVA — endosso institucional.
+ * OBRIGATÓRIA em toda página. A única exceção prevista pelo manual é o símbolo
+ * isolado como avatar de perfil.
+ */
+interface Props {
+  orientation?: 'horizontal' | 'vertical';
+  onDark?: boolean;
+  /** Vira link para a home quando true */
+  asLink?: boolean;
+}
+
+const { orientation = 'horizontal', onDark = false, asLink = false } = Astro.props;
+const Tag = asLink ? 'a' : 'div';
+---
+
+<Tag
+  class:list={['lockup', orientation, { 'on-dark': onDark }]}
+  {...asLink ? { href: '/', 'aria-label': 'Brasil Online — página inicial' } : {}}
+>
+  <Symbol variant={onDark ? 'negative' : 'primary'} size={orientation === 'vertical' ? 56 : 34} />
+  <span class="text">
+    <span class="wordmark">BRASIL ONLINE</span>
+    <span class="signature">Uma série do OBSERVA</span>
+  </span>
+</Tag>
+
+<style>
+  .lockup {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .lockup.vertical {
+    flex-direction: column;
+    gap: var(--space-2);
+    text-align: center;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.1875rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--navy);
+  }
+
+  .signature {
+    font-family: var(--font-mono);
+    font-size: var(--type-signature-size);
+    font-weight: var(--type-signature-weight);
+    line-height: var(--type-signature-line);
+    letter-spacing: var(--type-signature-tracking);
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+
+  .on-dark .wordmark {
+    color: var(--cream);
+  }
+  .on-dark .signature {
+    color: var(--sky-blue);
+  }
+
+  .vertical .wordmark {
+    font-size: 1.375rem;
+  }
+</style>

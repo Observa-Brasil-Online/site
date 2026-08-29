@@ -1,0 +1,95 @@
+---
+/**
+ * Button — primary (fill navy) / amber (fill âmbar + contorno navy obrigatório)
+ * / ghost (contorno navy) / ghost-dark (contorno creme, só sobre navy).
+ *
+ * Vira <a> quando recebe href.
+ */
+interface Props {
+  variant?: 'primary' | 'amber' | 'ghost' | 'ghost-dark';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit';
+  download?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  download = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+const extra = href
+  ? { href, ...(download ? { download: true } : {}) }
+  : { type };
+---
+
+<Tag class:list={['btn', variant, size, className]} {...extra} {...rest}>
+  <slot />
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: opacity var(--ease), background var(--ease);
+  }
+
+  .btn:hover {
+    opacity: 0.85;
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  /* tamanhos */
+  .sm { padding: var(--space-2) var(--space-4); font-size: 0.8125rem; }
+  .md { padding: var(--space-3) var(--space-5); font-size: 0.9375rem; }
+  .lg { padding: var(--space-4) var(--space-6); font-size: 1.0625rem; }
+
+  /* variantes */
+  .primary {
+    background: var(--navy);
+    color: var(--cream);
+  }
+
+  /* Fill âmbar sobre fundo claro exige contorno navy de 1pt — regra de contraste
+     do manual, não decoração. */
+  .amber {
+    background: var(--amber);
+    color: var(--graphite);
+    border: var(--border-amber-outline) solid var(--navy);
+  }
+
+  .ghost {
+    background: transparent;
+    color: var(--navy);
+    border: var(--border-thin) solid var(--navy);
+  }
+
+  .ghost-dark {
+    background: transparent;
+    color: var(--cream);
+    border: var(--border-thin) solid var(--cream);
+  }
+</style>

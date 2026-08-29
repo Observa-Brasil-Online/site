@@ -1,0 +1,46 @@
+---
+/**
+ * Badge — etiqueta mono de dado ou plataforma. Sempre caixa alta.
+ */
+interface Props {
+  tone?: 'navy' | 'cream' | 'amber';
+  class?: string;
+}
+
+const { tone = 'navy', class: className } = Astro.props;
+---
+
+<span class:list={['badge', tone, className]}>
+  <slot />
+</span>
+
+<style>
+  .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.688rem;
+    font-weight: 500;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+    padding: var(--space-1) 10px;
+    border-radius: var(--radius);
+    white-space: nowrap;
+  }
+
+  .navy {
+    background: var(--navy);
+    color: var(--cream);
+  }
+
+  .cream {
+    background: transparent;
+    color: var(--navy);
+    border: var(--border-thin) solid var(--navy);
+  }
+
+  .amber {
+    background: var(--amber);
+    color: var(--graphite);
+    border: var(--border-amber-outline) solid var(--navy);
+  }
+</style>

@@ -1,0 +1,54 @@
+---
+/**
+ * Símbolo Brasil Online — losango (proporção 1,57:1 das diagonais da bandeira)
+ * com lente circular (0,66× a diagonal vertical) e pupila (0,35× a lente).
+ * Lê-se como um olho apontado para o Brasil.
+ *
+ * Nunca girar (deixa de citar a bandeira e vira um quadrado), nunca distorcer,
+ * nunca recolorir fora das variantes abaixo, nunca aplicar sombra/brilho/3D.
+ */
+interface Props {
+  variant?: 'primary' | 'negative' | 'mono' | 'amber';
+  /** altura em px */
+  size?: number;
+  class?: string;
+}
+
+const { variant = 'primary', size = 40, class: className } = Astro.props;
+
+const paint = {
+  primary: { ring: 'var(--navy)', lens: 'var(--observa-blue)', lensRing: 'none', pupil: 'var(--cream)' },
+  negative: { ring: 'var(--cream)', lens: 'var(--observa-blue)', lensRing: 'var(--cream)', pupil: 'var(--cream)' },
+  mono: { ring: 'var(--navy)', lens: 'var(--navy)', lensRing: 'none', pupil: 'var(--cream)' },
+  amber: { ring: 'var(--navy)', lens: 'var(--amber)', lensRing: 'none', pupil: 'var(--cream)' },
+}[variant];
+
+// proporção original 156×116
+const width = Math.round((size * 156) / 116);
+---
+
+<svg
+  viewBox="0 0 156 116"
+  width={width}
+  height={size}
+  class={className}
+  aria-hidden="true"
+  focusable="false"
+>
+  <polygon
+    points="78,23 133,58 78,93 23,58"
+    fill="none"
+    stroke={paint.ring}
+    stroke-width="8"
+    stroke-linejoin="round"
+  ></polygon>
+  <circle
+    cx="78"
+    cy="58"
+    r="23"
+    fill={paint.lens}
+    stroke={paint.lensRing}
+    stroke-width={paint.lensRing === 'none' ? 0 : 1}
+  ></circle>
+  <circle cx="78" cy="58" r="8" fill={paint.pupil}></circle>
+</svg>

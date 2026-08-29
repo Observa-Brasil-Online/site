@@ -1,0 +1,41 @@
+---
+/**
+ * Card — contêiner chapado. 4px de raio, borda fina de 1px, sem sombra.
+ * A hierarquia vem do bloco de cor, não de elevação.
+ */
+interface Props {
+  surface?: 'cream' | 'navy' | 'block';
+  padding?: string;
+  class?: string;
+}
+
+const { surface = 'cream', padding = 'var(--space-5)', class: className } = Astro.props;
+---
+
+<div class:list={['card', surface, className]} style={`padding:${padding}`}>
+  <slot />
+</div>
+
+<style>
+  .card {
+    border-radius: var(--radius);
+  }
+
+  .cream {
+    background: var(--cream);
+    border: var(--border-thin) solid var(--mist-gray);
+    color: var(--graphite);
+  }
+
+  .navy {
+    background: var(--navy);
+    border: var(--border-thin) solid var(--navy);
+    color: var(--cream);
+  }
+
+  .block {
+    background: var(--mist-gray);
+    border: none;
+    color: var(--graphite);
+  }
+</style>

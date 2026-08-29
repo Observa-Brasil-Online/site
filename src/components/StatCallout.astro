@@ -1,0 +1,57 @@
+---
+/**
+ * StatCallout — o padrão "número-manchete", unidade de conteúdo característica
+ * da série: número grande em Archivo ExtraBold + legenda mono.
+ *
+ * Contraste: âmbar puro como TEXTO em fundo claro reprova na WCAG (2.15:1).
+ * O tom padrão resolve para âmbar escuro (4.92:1, AA). O tom 'amber-on-dark'
+ * mantém o âmbar puro e só vale sobre navy (5.47:1, AA).
+ */
+interface Props {
+  value: string;
+  label: string;
+  tone?: 'amber' | 'navy' | 'amber-on-dark';
+  size?: 'md' | 'lg';
+}
+
+const { value, label, tone = 'amber', size = 'lg' } = Astro.props;
+---
+
+<div class:list={['stat', tone, size]}>
+  <span class="value tabular">{value}</span>
+  <span class="label">{label}</span>
+</div>
+
+<style>
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+
+  .lg .value { font-size: clamp(3rem, 7vw, 5rem); }
+  .md .value { font-size: clamp(2rem, 4vw, 2.75rem); }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--type-label-size);
+    font-weight: 500;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+    color: var(--graphite);
+    max-width: 28ch;
+  }
+
+  .amber .value { color: var(--amber-dark); }
+  .navy .value { color: var(--navy); }
+
+  .amber-on-dark .value { color: var(--amber); }
+  .amber-on-dark .label { color: var(--sky-blue); }
+</style>

@@ -1,0 +1,276 @@
+---
+/**
+ * Espécime do design system — página interna de conferência, fora da navegação.
+ * Serve para ver todos os primitivos juntos e pegar regressão visual cedo.
+ * Não indexar.
+ */
+import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+import Badge from '../components/Badge.astro';
+import Card from '../components/Card.astro';
+import StatCallout from '../components/StatCallout.astro';
+import ComparisonBar from '../components/ComparisonBar.astro';
+import SignatureLockup from '../components/SignatureLockup.astro';
+import Symbol from '../components/Symbol.astro';
+
+const cores = [
+  ['Azul-noite', '--navy', '#12345C'],
+  ['Âmbar', '--amber', '#D9A227'],
+  ['Âmbar escuro', '--amber-dark', '#8F6410'],
+  ['Azul OBSERVA', '--observa-blue', '#0B4F9E'],
+  ['Creme', '--cream', '#FBF7EF'],
+  ['Grafite', '--graphite', '#1B1D21'],
+  ['Azul-céu', '--sky-blue', '#7FB2E8'],
+  ['Cinza-névoa', '--mist-gray', '#C9D2DC'],
+  ['Terracota', '--terracotta', '#B4472A'],
+  ['Verde-musgo', '--moss-green', '#3F6B52'],
+];
+---
+
+<Base title="Espécime do design system" description="Página interna de conferência dos primitivos.">
+  <Fragment slot="head">
+    <meta name="robots" content="noindex, nofollow" />
+  </Fragment>
+
+  <div class="container kit">
+    <h1>Espécime</h1>
+    <p class="intro">
+      Conferência dos primitivos. Página interna, fora da navegação e não indexada.
+    </p>
+
+    <section>
+      <h2>Cores</h2>
+      <div class="swatches">
+        {
+          cores.map(([nome, token, hex]) => (
+            <div class="swatch">
+              <div class="chip" style={`background: var(${token})`} />
+              <b>{nome}</b>
+              <span class="mono tabular">{hex}</span>
+              <span class="mono token">{token}</span>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section>
+      <h2>Símbolo</h2>
+      <div class="row">
+        <div class="specimen"><Symbol variant="primary" size={56} /><span class="mono">primary</span></div>
+        <div class="specimen on-navy"><Symbol variant="negative" size={56} /><span class="mono">negative</span></div>
+        <div class="specimen"><Symbol variant="mono" size={56} /><span class="mono">mono</span></div>
+        <div class="specimen"><Symbol variant="amber" size={56} /><span class="mono">amber</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Assinatura</h2>
+      <div class="row">
+        <div class="specimen"><SignatureLockup /></div>
+        <div class="specimen on-navy"><SignatureLockup onDark /></div>
+        <div class="specimen"><SignatureLockup orientation="vertical" /></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Botões</h2>
+      <div class="row items">
+        <Button variant="primary">Baixar relatório</Button>
+        <Button variant="amber">Ver última edição</Button>
+        <Button variant="ghost">Ver todas</Button>
+      </div>
+      <div class="row items on-navy pad">
+        <Button variant="ghost-dark">Como funciona</Button>
+        <Button variant="amber">Baixar PDF</Button>
+      </div>
+      <div class="row items">
+        <Button size="sm">Pequeno</Button>
+        <Button size="md">Médio</Button>
+        <Button size="lg">Grande</Button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Badges</h2>
+      <div class="row items">
+        <Badge tone="navy">X (Twitter)</Badge>
+        <Badge tone="cream">Instagram</Badge>
+        <Badge tone="amber">TikTok</Badge>
+      </div>
+    </section>
+
+    <section>
+      <h2>Cards</h2>
+      <div class="cards">
+        <Card surface="cream"><b>cream</b><p>Contêiner padrão sobre papel.</p></Card>
+        <Card surface="navy"><b>navy</b><p>Bloco escuro, para destaque institucional.</p></Card>
+        <Card surface="block"><b>block</b><p>Seção em cinza-névoa.</p></Card>
+      </div>
+    </section>
+
+    <section>
+      <h2>Dados</h2>
+      <p class="nota">
+        Números reais da edição 01 (4 a 10 de agosto de 2026), para conferir o
+        tratamento tipográfico com conteúdo verdadeiro.
+      </p>
+      <div class="cards">
+        <div class="specimen">
+          <StatCallout value="66,3%" label="Interações da direita, semana 01" />
+        </div>
+        <div class="specimen on-navy">
+          <StatCallout value="2,3×" label="Interação média por publicação" tone="amber-on-dark" />
+        </div>
+      </div>
+      <div class="bars">
+        <ComparisonBar
+          leftValue={54.2}
+          rightValue={45.8}
+          caption="Publicações por campo político na semana 01"
+        />
+        <div class="on-navy pad">
+          <ComparisonBar
+            leftValue={33.7}
+            rightValue={66.3}
+            caption="Interações por campo político na semana 01"
+          />
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .kit {
+    padding-block: var(--space-8);
+  }
+
+  .kit h1 {
+    font-size: var(--type-title-size);
+  }
+
+  .intro {
+    margin-top: var(--space-3);
+    color: var(--graphite);
+  }
+
+  section {
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: var(--border-thin) solid var(--mist-gray);
+  }
+
+  section h2 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-5);
+  }
+
+  .nota {
+    font-size: 0.9375rem;
+    color: var(--graphite);
+    margin-bottom: var(--space-5);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    align-items: center;
+    margin-bottom: var(--space-4);
+  }
+
+  .items {
+    align-items: center;
+  }
+
+  .specimen {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-5);
+    border: var(--border-thin) solid var(--mist-gray);
+    border-radius: var(--radius);
+  }
+
+  .specimen .mono {
+    color: var(--graphite);
+    opacity: 0.7;
+  }
+
+  .on-navy {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--cream);
+  }
+
+  .on-navy .mono {
+    color: var(--sky-blue);
+    opacity: 1;
+  }
+
+  .pad {
+    padding: var(--space-5);
+    border-radius: var(--radius);
+  }
+
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .swatch .chip {
+    height: 56px;
+    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--mist-gray);
+    margin-bottom: var(--space-2);
+  }
+
+  .swatch b {
+    font-size: 0.875rem;
+    color: var(--navy);
+  }
+
+  .swatch .mono {
+    font-size: 0.688rem;
+    color: var(--graphite);
+  }
+
+  .swatch .token {
+    opacity: 0.6;
+    text-transform: none;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .cards b {
+    font-family: var(--font-mono);
+    font-size: 0.688rem;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+  }
+
+  .cards p {
+    margin-top: var(--space-2);
+    font-size: 0.9375rem;
+  }
+
+  .bars {
+    display: grid;
+    gap: var(--space-6);
+    max-width: 520px;
+    margin-top: var(--space-6);
+  }
+</style>
