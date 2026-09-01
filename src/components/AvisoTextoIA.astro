@@ -1,0 +1,31 @@
+---
+/**
+ * Nota de rodapé obrigatória sempre que `apresentacaoGeradaPorIA` for true
+ * num relatório — usada na tela de Relatório-detalhe (fase 4), abaixo do
+ * texto de apresentação. Some sozinha quando a equipe assina o texto de
+ * verdade e o campo é removido do frontmatter.
+ */
+---
+
+<p class="aviso-ia mono">
+  Este resumo foi gerado por IA a partir do relatório completo e está em validação pela equipe.
+</p>
+
+<style>
+  .aviso-ia {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: var(--border-thin) dashed var(--mist-gray);
+    color: var(--graphite);
+    opacity: 0.68;
+    font-size: 0.688rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    max-width: var(--prose-max);
+  }
+
+  :global(.band-dark) .aviso-ia {
+    color: var(--sky-blue);
+    border-top-color: rgba(251, 247, 239, 0.22);
+  }
+</style>

@@ -1,0 +1,266 @@
+---
+import Base from '../layouts/Base.astro';
+import Card from '../components/Card.astro';
+import { getCollection } from 'astro:content';
+import { SITE, AMOSTRA } from '../config';
+
+const integrantes = await getCollection('integrantes');
+
+const PREFIXOS = /^(Prof\.|Profa\.?|Profa|Dra\.|Dr\.|Ms\.|Bel\.)\s+/;
+function chaveOrdenacao(nome: string) {
+  let s = nome;
+  while (PREFIXOS.test(s)) s = s.replace(PREFIXOS, '');
+  return s.toLocaleLowerCase('pt-BR');
+}
+
+const equipe = [...integrantes].sort((a, b) =>
+  chaveOrdenacao(a.data.nome).localeCompare(chaveOrdenacao(b.data.nome), 'pt-BR')
+);
+
+const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes && !p.data.redeSocial).length;
+---
+
+<Base
+  title="Quem somos"
+  description="O Brasil Online é um projeto do OBSERVA — Observatório de Conflitos na Internet, da UFABC."
+>
+  <section class="hero-institucional band-dark">
+    <div class="container hero-inner">
+      <div class="texto">
+        <span class="mono kicker">O que é</span>
+        <h1>Mapear a disputa</h1>
+        <p class="lede">
+          O Brasil Online é um projeto do OBSERVA — Observatório de Conflitos na Internet, da UFABC.
+          Toda semana medimos o debate político brasileiro nas plataformas digitais: quem publica, quem
+          engaja e em torno de quais conflitos a disputa se organiza. Uma edição por semana, até a
+          eleição.
+        </p>
+        <p class="lede">
+          Como os campos de esquerda e direita se enfrentam nas principais plataformas digitais do país.
+          Não é sobre quem tem razão. É sobre onde, como e com que intensidade a disputa acontece.
+        </p>
+      </div>
+
+      <Card surface="cream" class="card-recorte">
+        <span class="mono card-titulo">O recorte</span>
+        <dl>
+          <div>
+            <dt class="tabular">{AMOSTRA.perfis}</dt>
+            <dd>perfis monitorados</dd>
+          </div>
+          <div>
+            <dt class="tabular">{AMOSTRA.plataformas.length}</dt>
+            <dd>plataformas — {AMOSTRA.plataformas.join(', ')}</dd>
+          </div>
+          <div>
+            <dt class="tabular">2</dt>
+            <dd>campos em disputa — esquerda e direita, sempre comparados</dd>
+          </div>
+        </dl>
+      </Card>
+    </div>
+  </section>
+
+  <section class="equipe">
+    <div class="container">
+      <span class="mono eyebrow">Equipe</span>
+      <h2>{equipe.length} pesquisadoras e pesquisadores</h2>
+      {
+        pendentes > 0 && (
+          <p class="nota-pendencia">
+            Formação, grupo, Lattes e redes sociais ainda não constam para {pendentes} pessoas da
+            equipe — a lista completa será levantada com o time de divulgação.
+          </p>
+        )
+      }
+      <div class="equipe-grid">
+        {
+          equipe.map((p) => (
+            <div class="pessoa">
+              <span class="nome">{p.data.nome}</span>
+              {p.data.formacaoAtual && <span class="formacao">{p.data.formacaoAtual}</span>}
+              <div class="links">
+                {p.data.lattes && (
+                  <a href={p.data.lattes} target="_blank" rel="noopener noreferrer">
+                    Lattes
+                  </a>
+                )}
+                {p.data.redeSocial && (
+                  <a href={p.data.redeSocial} target="_blank" rel="noopener noreferrer">
+                    Rede social
+                  </a>
+                )}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="contato band-dark">
+    <div class="container">
+      <span class="mono eyebrow">Contato</span>
+      <p class="lede">
+        Dúvidas, correções ou proposta de parceria:
+        <a href={`mailto:${SITE.contact}`}>{SITE.contact}</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero-institucional {
+    padding-block: var(--space-8);
+  }
+
+  .hero-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-7);
+    align-items: flex-start;
+  }
+
+  .texto {
+    flex: 1 1 380px;
+    min-width: 0;
+  }
+
+  .kicker {
+    color: var(--sky-blue);
+    display: block;
+    margin-bottom: var(--space-3);
+  }
+
+  .hero-inner h1 {
+    max-width: 14ch;
+    margin-bottom: var(--space-5);
+  }
+
+  .lede {
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--sky-blue);
+    max-width: 52ch;
+    margin-bottom: var(--space-4);
+  }
+
+  :global(.card-recorte) {
+    flex: 1 1 280px;
+    max-width: 340px;
+  }
+
+  .card-titulo {
+    display: block;
+    color: var(--amber-dark);
+    margin-bottom: var(--space-4);
+  }
+
+  dl {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  dl > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  dt {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.75rem;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--graphite);
+  }
+
+  /* ---------- equipe ---------- */
+  .equipe {
+    padding-block: var(--space-8);
+  }
+
+  .eyebrow {
+    display: block;
+    color: var(--amber-dark);
+    margin-bottom: var(--space-3);
+  }
+
+  .nota-pendencia {
+    margin-top: var(--space-3);
+    font-size: 0.875rem;
+    color: var(--graphite);
+    opacity: 0.75;
+    max-width: 60ch;
+  }
+
+  .equipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .pessoa {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border: var(--border-thin) solid var(--mist-gray);
+    border-radius: var(--radius);
+  }
+
+  .nome {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--navy);
+    line-height: 1.35;
+  }
+
+  .formacao {
+    font-size: 0.8125rem;
+    color: var(--graphite);
+  }
+
+  .links {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  .links a {
+    font-family: var(--font-mono);
+    font-size: 0.688rem;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    text-decoration: underline;
+  }
+
+  /* ---------- contato ---------- */
+  .contato {
+    padding-block: var(--space-7);
+  }
+
+  .contato .lede {
+    color: var(--sky-blue);
+    margin: 0;
+  }
+
+  .contato a {
+    color: var(--cream);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

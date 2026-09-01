@@ -52,7 +52,8 @@ const fmt = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 
     gap: var(--space-4);
     margin-bottom: var(--space-2);
     font-family: var(--font-mono);
-    font-size: 0.688rem;
+    /* era 0.688rem (11px) — pequeno demais como legenda de gráfico */
+    font-size: 0.875rem;
     font-weight: 500;
     letter-spacing: var(--type-label-tracking);
     text-transform: uppercase;

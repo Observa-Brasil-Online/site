@@ -1,0 +1,287 @@
+---
+import Base from '../../layouts/Base.astro';
+import Button from '../../components/Button.astro';
+import ReportCard from '../../components/ReportCard.astro';
+import { getRelatoriosOrdenados } from '../../lib/relatorios';
+
+const relatorios = await getRelatoriosOrdenados();
+
+const semanas = relatorios.map((r) => ({ valor: String(r.data.edicao), rotulo: `Semana ${r.data.edicao}` }));
+
+const plataformasSet = new Set<string>();
+const temasSet = new Set<string>();
+for (const r of relatorios) {
+  r.data.plataformas.forEach((p) => plataformasSet.add(p));
+  r.data.temas.forEach((t) => temasSet.add(t));
+}
+const plataformas = [...plataformasSet].map((v) => ({ valor: v, rotulo: v }));
+const temas = [...temasSet].sort().map((v) => ({ valor: v, rotulo: v }));
+
+// "todas as semanas/plataformas" (feminino) vs "todos os temas" (masculino)
+const grupos = [
+  { chave: 'semana', nome: 'Semana', todos: 'Todas', opcoes: semanas },
+  { chave: 'plataforma', nome: 'Plataforma', todos: 'Todas', opcoes: plataformas },
+  { chave: 'tema', nome: 'Tema', todos: 'Todos', opcoes: temas },
+].filter((g) => g.opcoes.length > 0);
+---
+
+<Base
+  title="Relatórios"
+  description="Todas as edições semanais do Brasil Online, com filtro por semana, plataforma e tema."
+>
+  <section class="hero-curto band-dark">
+    <div class="container">
+      <span class="mono kicker">Acervo</span>
+      <h1>Relatórios</h1>
+      <p class="contagem mono tabular">{relatorios.length} edições publicadas</p>
+    </div>
+  </section>
+
+  <section class="lista">
+    <div class="container">
+      <div class="filtros" id="filtros">
+        {
+          grupos.map((g) => (
+            <details class="filtro" data-grupo={g.chave} data-todos={g.todos}>
+              <summary>
+                <span class="rotulo">{g.nome}</span>
+                <span class="estado mono" data-estado>
+                  {g.todos}
+                </span>
+              </summary>
+              <div class="painel">
+                {g.opcoes.map((o) => (
+                  <label class="opcao">
+                    <input type="checkbox" value={o.valor} data-grupo={g.chave} />
+                    <span>{o.rotulo}</span>
+                  </label>
+                ))}
+              </div>
+            </details>
+          ))
+        }
+        <button type="button" id="limpar-filtros" class="limpar mono">
+          Limpar
+        </button>
+      </div>
+
+      <div class="cards" id="lista-relatorios">
+        {relatorios.map((r) => <ReportCard relatorio={r} />)}
+      </div>
+
+      <p class="vazio mono" id="estado-vazio" hidden>
+        Nenhuma edição encontrada com esses filtros.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const raiz = document.getElementById('filtros')!;
+  const detalhes = [...raiz.querySelectorAll<HTMLDetailsElement>('details.filtro')];
+  const cards = [...document.querySelectorAll<HTMLElement>('#lista-relatorios .report-card')];
+  const vazio = document.getElementById('estado-vazio')!;
+
+  // clique fora fecha qualquer painel aberto
+  document.addEventListener('click', (e) => {
+    if (!raiz.contains(e.target as Node)) {
+      detalhes.forEach((d) => (d.open = false));
+      return;
+    }
+    detalhes.forEach((d) => {
+      if (!d.contains(e.target as Node)) d.open = false;
+    });
+  });
+
+  // só um painel aberto por vez
+  detalhes.forEach((d) => {
+    d.querySelector('summary')?.addEventListener('click', () => {
+      detalhes.forEach((outro) => {
+        if (outro !== d) outro.open = false;
+      });
+    });
+  });
+
+  function selecaoDoGrupo(grupo: string): string[] {
+    return [...raiz.querySelectorAll<HTMLInputElement>(`input[data-grupo="${grupo}"]:checked`)].map(
+      (i) => i.value
+    );
+  }
+
+  function atualizarEstados() {
+    detalhes.forEach((d) => {
+      const grupo = d.dataset.grupo!;
+      const selecao = selecaoDoGrupo(grupo);
+      const estado = d.querySelector('[data-estado]')!;
+      estado.textContent =
+        selecao.length === 0
+          ? (d.dataset.todos ?? 'Todos')
+          : `${selecao.length} selecionada${selecao.length > 1 ? 's' : ''}`;
+    });
+  }
+
+  function aplicarFiltros() {
+    const semanas = selecaoDoGrupo('semana');
+    const plataformas = selecaoDoGrupo('plataforma');
+    const temasSel = selecaoDoGrupo('tema');
+
+    let visiveis = 0;
+
+    cards.forEach((card) => {
+      const edicao = card.dataset.edicao ?? '';
+      const cardPlataformas = (card.dataset.plataformas ?? '').split('|');
+      const cardTemas = (card.dataset.temas ?? '').split('|');
+
+      const passaSemana = semanas.length === 0 || semanas.includes(edicao);
+      const passaPlataforma =
+        plataformas.length === 0 || plataformas.some((p) => cardPlataformas.includes(p));
+      const passaTema = temasSel.length === 0 || temasSel.some((t) => cardTemas.includes(t));
+
+      const passa = passaSemana && passaPlataforma && passaTema;
+      card.hidden = !passa;
+      if (passa) visiveis++;
+    });
+
+    vazio.hidden = visiveis > 0;
+    atualizarEstados();
+  }
+
+  raiz.addEventListener('change', aplicarFiltros);
+
+  document.getElementById('limpar-filtros')?.addEventListener('click', () => {
+    raiz.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((i) => (i.checked = false));
+    detalhes.forEach((d) => (d.open = false));
+    aplicarFiltros();
+  });
+</script>
+
+<style>
+  .hero-curto {
+    padding-block: var(--space-7) var(--space-6);
+  }
+
+  .kicker {
+    color: var(--sky-blue);
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .contagem {
+    color: var(--sky-blue);
+    margin-top: var(--space-3);
+  }
+
+  .lista {
+    padding-block: var(--space-7) var(--space-9);
+  }
+
+  /* ---------- filtros ---------- */
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-5);
+    border-bottom: var(--border-thin) solid var(--mist-gray);
+  }
+
+  .filtro {
+    position: relative;
+  }
+
+  .filtro summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    list-style: none;
+    cursor: pointer;
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-thin) solid var(--navy);
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .filtro summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .filtro .rotulo {
+    color: var(--navy);
+    font-weight: 500;
+  }
+
+  .filtro .estado {
+    color: var(--graphite);
+    font-size: 0.688rem;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+  }
+
+  .filtro[open] summary {
+    background: var(--navy);
+  }
+  .filtro[open] .rotulo,
+  .filtro[open] .estado {
+    color: var(--cream);
+  }
+
+  .painel {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    left: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 220px;
+    padding: var(--space-4);
+    background: var(--cream);
+    border: var(--border-thin) solid var(--navy);
+    border-radius: var(--radius);
+  }
+
+  .opcao {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .opcao input {
+    accent-color: var(--navy);
+  }
+
+  .limpar {
+    align-self: center;
+    background: none;
+    border: none;
+    color: var(--graphite);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .limpar:hover {
+    color: var(--navy);
+  }
+
+  /* ---------- lista ---------- */
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .vazio {
+    color: var(--graphite);
+    text-align: center;
+    padding-block: var(--space-8);
+  }
+</style>

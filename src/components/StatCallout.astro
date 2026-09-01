@@ -41,7 +41,9 @@ const { value, label, tone = 'amber', size = 'lg' } = Astro.props;
 
   .label {
     font-family: var(--font-mono);
-    font-size: var(--type-label-size);
+    /* maior que --type-label-size (12px) — legível como legenda de gráfico,
+       não só como um rótulo de badge */
+    font-size: 0.875rem;
     font-weight: 500;
     letter-spacing: var(--type-label-tracking);
     text-transform: uppercase;

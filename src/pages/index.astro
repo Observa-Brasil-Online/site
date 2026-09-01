@@ -3,7 +3,16 @@ import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import Badge from '../components/Badge.astro';
 import Card from '../components/Card.astro';
+import StatCallout from '../components/StatCallout.astro';
+import ComparisonBar from '../components/ComparisonBar.astro';
+import ReportCard from '../components/ReportCard.astro';
 import { SITE, AMOSTRA } from '../config';
+import { getRelatoriosOrdenados, formatarPeriodo } from '../lib/relatorios';
+
+const relatorios = await getRelatoriosOrdenados();
+const ultima = relatorios[0];
+const r = ultima?.data;
+const anteriores = relatorios.slice(1, 4);
 
 // Copy verbatim do carrossel "Quem Somos" já publicado — não reescrever.
 const camadas = [
@@ -32,19 +41,62 @@ const camadas = [
   <section class="hero band-dark">
     <div class="container hero-inner">
       <span class="mono kicker">OBSERVA · Eleições 2026</span>
-      <h1>A eleição de 2026 também acontece no feed.</h1>
-      <p class="lede">E alguém está medindo — semana a semana, até outubro.</p>
-      <div class="actions">
-        <Button variant="amber" href="/relatorios">Ver os relatórios</Button>
-        <Button variant="ghost-dark" href="/quem-somos">Como funciona</Button>
-      </div>
+      {
+        r ? (
+          <>
+            <h1>{r.titulo}</h1>
+            <p class="lede">{r.chamada}</p>
+            <div class="actions">
+              <Button variant="amber" href={r.pdf} download>
+                Baixar relatório (PDF)
+              </Button>
+              <Button variant="ghost-dark" href="/relatorios">
+                Ver todas as edições
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1>A eleição de 2026 também acontece no feed</h1>
+            <p class="lede">E alguém está medindo — semana a semana, até outubro.</p>
+          </>
+        )
+      }
     </div>
   </section>
+
+  {
+    r && (
+      <section class="destaque">
+        <div class="container destaque-inner">
+          <div class="destaque-texto">
+            <span class="mono eyebrow">
+              Semana {r.edicao} · {formatarPeriodo(r.periodoInicio, r.periodoFim)}
+            </span>
+            <h2>{r.chamada}</h2>
+          </div>
+          <div class="destaque-dados">
+            <StatCallout
+              value={`${r.dados?.interacoesDireita?.toLocaleString('pt-BR')}%`}
+              label={`Interações da direita, semana ${r.edicao}`}
+            />
+            {r.dados?.interacoesEsquerda != null && r.dados?.interacoesDireita != null && (
+              <ComparisonBar
+                leftValue={r.dados.interacoesEsquerda}
+                rightValue={r.dados.interacoesDireita}
+                caption={`Interações por campo político na semana ${r.edicao}`}
+              />
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <section class="metodo band-block">
     <div class="container">
       <span class="mono eyebrow">Como funciona</span>
-      <h2>Três camadas.</h2>
+      <h2>Três camadas</h2>
       <div class="camadas">
         {
           camadas.map((c) => (
@@ -58,6 +110,29 @@ const camadas = [
       </div>
     </div>
   </section>
+
+  {
+    anteriores.length > 0 && (
+      <section class="edicoes">
+        <div class="container">
+          <div class="edicoes-head">
+            <div>
+              <span class="mono eyebrow">Acervo</span>
+              <h2>Edições anteriores</h2>
+            </div>
+            <Button href="/relatorios" variant="ghost">
+              Ver todas
+            </Button>
+          </div>
+          <div class="edicoes-grid">
+            {anteriores.map((rel) => (
+              <ReportCard relatorio={rel} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <section class="recorte">
     <div class="container recorte-inner">
@@ -87,7 +162,7 @@ const camadas = [
   }
 
   .hero h1 {
-    max-width: 16ch;
+    max-width: 20ch;
   }
 
   .lede {
@@ -95,7 +170,7 @@ const camadas = [
     font-weight: 400;
     line-height: 1.4;
     color: var(--sky-blue);
-    max-width: 44ch;
+    max-width: 52ch;
   }
 
   .actions {
@@ -103,6 +178,43 @@ const camadas = [
     flex-wrap: wrap;
     gap: var(--space-3);
     margin-top: var(--space-2);
+  }
+
+  /* ---------- destaque ---------- */
+  .destaque {
+    padding-block: var(--space-8);
+  }
+
+  .destaque-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-7);
+    align-items: flex-start;
+  }
+
+  .destaque-texto,
+  .destaque-dados {
+    flex: 1 1 320px;
+    min-width: 0;
+  }
+
+  .destaque-texto .eyebrow {
+    display: block;
+    color: var(--amber-dark);
+    margin-bottom: var(--space-3);
+  }
+
+  .destaque-texto h2 {
+    max-width: 26ch;
+    /* menor que o h2 padrão — ao lado do StatCallout, o tamanho de título
+       normal deixava a composição pesada demais */
+    font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+  }
+
+  .destaque-dados {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
   }
 
   /* ---------- método ---------- */
@@ -137,6 +249,26 @@ const camadas = [
   .camadas p {
     font-size: 0.9375rem;
     line-height: 1.5;
+  }
+
+  /* ---------- edições anteriores ---------- */
+  .edicoes {
+    padding-block: var(--space-8);
+  }
+
+  .edicoes-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  .edicoes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-5);
   }
 
   /* ---------- recorte ---------- */

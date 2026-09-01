@@ -1,0 +1,90 @@
+---
+import Badge from './Badge.astro';
+import Button from './Button.astro';
+import type { Relatorio } from '../lib/relatorios';
+import { formatarPeriodo } from '../lib/relatorios';
+
+interface Props {
+  relatorio: Relatorio;
+}
+
+const { relatorio } = Astro.props;
+const r = relatorio.data;
+---
+
+<article
+  class="report-card"
+  data-plataformas={r.plataformas.join('|')}
+  data-temas={r.temas.join('|')}
+  data-edicao={r.edicao}
+>
+  <div class="head">
+    <span class="mono eyebrow">Semana {r.edicao} · {formatarPeriodo(r.periodoInicio, r.periodoFim)}</span>
+    <h3><a href={`/relatorios/${relatorio.id}`}>{r.titulo}</a></h3>
+    <p class="chamada">{r.chamada}</p>
+  </div>
+
+  <div class="tags">
+    {r.temas.slice(0, 3).map((t) => <Badge tone="cream">{t}</Badge>)}
+  </div>
+
+  <div class="actions">
+    <Button href={`/relatorios/${relatorio.id}`} variant="ghost" size="sm">Ver edição</Button>
+    <Button href={r.pdf} variant="primary" size="sm" download>Baixar PDF</Button>
+  </div>
+</article>
+
+<style>
+  .report-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: var(--border-thin) solid var(--mist-gray);
+    border-radius: var(--radius);
+    background: var(--cream);
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .eyebrow {
+    color: var(--amber-dark);
+  }
+
+  h3 {
+    font-size: 1.1875rem;
+  }
+
+  h3 a {
+    color: var(--navy);
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    text-decoration: underline;
+  }
+
+  .chamada {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--graphite);
+    max-width: 62ch;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: auto;
+  }
+</style>
