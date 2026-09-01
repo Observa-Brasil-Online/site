@@ -1,0 +1,12 @@
+{
+  // Configuração do Cloudflare Workers para servir o site estático gerado
+  // pelo Astro. Sem "main" (nenhum código de Worker) — só assets, o
+  // equivalente ao antigo Cloudflare Pages dentro do fluxo unificado
+  // "Workers & Pages".
+  "name": "site-observa",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist"
+    // "not_found_handling": "404-page" — ligar quando existir src/pages/404.astro (fase 5)
+  }
+}
