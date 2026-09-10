@@ -2,7 +2,11 @@
 import SignatureLockup from './SignatureLockup.astro';
 import { NAV } from '../config';
 
-const path = Astro.url.pathname.replace(/\.html$/, '') || '/';
+// Com build.format:'file', a home pode resolver para "/index.html" em vez de
+// "/" durante o build estático (confirmado: só a Home perdia o sublinhado
+// ativo, /relatorios e /quem-somos funcionavam). Normaliza os dois formatos.
+const semExtensao = Astro.url.pathname.replace(/\.html$/, '');
+const path = semExtensao.replace(/\/index$/, '') || '/';
 const isCurrent = (href: string) =>
   href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
 ---
