@@ -18,7 +18,7 @@ export const SITE = {
 /** Recorte da série — mencionar sempre que houver número na tela. */
 export const AMOSTRA = {
   perfis: 162,
-  plataformas: ['X (Twitter)', 'Instagram', 'TikTok'] as const,
+  plataformas: ['X', 'Instagram', 'TikTok'] as const,
   campos: ['Esquerda', 'Direita'] as const,
 } as const;
 
@@ -26,4 +26,16 @@ export const NAV = [
   { label: 'Início', href: '/' },
   { label: 'Relatórios', href: '/relatorios' },
   { label: 'Quem somos', href: '/quem-somos' },
+] as const;
+
+/**
+ * Perfis do projeto. Só entra no rodapé o que tem `url` — botão que não leva
+ * a lugar nenhum é pior que botão ausente. Para publicar uma rede nova, basta
+ * preencher a url aqui.
+ */
+export const REDES = [
+  { rede: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/observa.internet/' },
+  { rede: 'linkedin', label: 'LinkedIn', url: '' },
+  { rede: 'tiktok', label: 'TikTok', url: '' },
+  { rede: 'x', label: 'X', url: '' },
 ] as const;

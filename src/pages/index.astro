@@ -1,20 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
-import Badge from '../components/Badge.astro';
 import Card from '../components/Card.astro';
 import StatCallout from '../components/StatCallout.astro';
 import ComparisonBar from '../components/ComparisonBar.astro';
 import ReportCard from '../components/ReportCard.astro';
-import { SITE, AMOSTRA } from '../config';
+import HeroBlocos from '../components/HeroBlocos.astro';
+import { SITE } from '../config';
 import { getRelatoriosOrdenados, formatarPeriodo } from '../lib/relatorios';
 
 const relatorios = await getRelatoriosOrdenados();
 const ultima = relatorios[0];
 const r = ultima?.data;
-const anteriores = relatorios.slice(1, 4);
 
-// Copy verbatim do carrossel "Quem Somos" já publicado — não reescrever.
+// só a edição imediatamente anterior à do hero
+const anterior = relatorios[1];
+
+// tira o ponto final: a chamada vira manchete, e manchete não leva ponto
+const semPonto = (t: string) => t.replace(/\.\s*$/, '');
+
 const camadas = [
   {
     n: '01',
@@ -24,13 +28,13 @@ const camadas = [
   },
   {
     n: '02',
-    titulo: 'Indicadores quantitativos',
+    titulo: 'Os números',
     texto:
       'Volume de publicações, interações e engajamento médio por post — por campo e por plataforma.',
   },
   {
     n: '03',
-    titulo: 'Leitura qualitativa',
+    titulo: 'As narrativas',
     texto:
       'Identificação dos principais conflitos discursivos do período — os temas em torno dos quais a disputa se organiza.',
   },
@@ -40,26 +44,41 @@ const camadas = [
 <Base title={SITE.name}>
   <section class="hero band-dark">
     <div class="container hero-inner">
-      <span class="mono kicker">OBSERVA · Eleições 2026</span>
+      <div class="hero-texto">
+        <span class="mono kicker">OBSERVA · Eleições 2026</span>
+        {
+          r ? (
+            <>
+              <h1>{r.titulo}</h1>
+              <p class="lede">{r.chamada}</p>
+              <div class="actions">
+                <Button variant="amber" href={r.pdf} download>
+                  Baixar relatório (PDF)
+                </Button>
+                <Button variant="ghost-dark" href="/relatorios">
+                  Ver todas as edições
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1>A eleição de 2026 também acontece no feed</h1>
+              <p class="lede">E alguém está medindo — semana a semana, até outubro.</p>
+            </>
+          )
+        }
+      </div>
+
       {
-        r ? (
-          <>
-            <h1>{r.titulo}</h1>
-            <p class="lede">{r.chamada}</p>
-            <div class="actions">
-              <Button variant="amber" href={r.pdf} download>
-                Baixar relatório (PDF)
-              </Button>
-              <Button variant="ghost-dark" href="/relatorios">
-                Ver todas as edições
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <h1>A eleição de 2026 também acontece no feed</h1>
-            <p class="lede">E alguém está medindo — semana a semana, até outubro.</p>
-          </>
+        r?.dados?.interacoesEsquerda != null && r?.dados?.interacoesDireita != null && (
+          <div class="hero-blocos">
+            <HeroBlocos
+              esquerda={r.dados.interacoesEsquerda}
+              direita={r.dados.interacoesDireita}
+              plataformas={r.dados.plataformas}
+              edicao={r.edicao}
+            />
+          </div>
         )
       }
     </div>
@@ -73,12 +92,15 @@ const camadas = [
             <span class="mono eyebrow">
               Semana {r.edicao} · {formatarPeriodo(r.periodoInicio, r.periodoFim)}
             </span>
-            <h2>{r.chamada}</h2>
+            <h2>
+              <a href={`/relatorios/${ultima.id}`}>{semPonto(r.chamada)}</a>
+            </h2>
           </div>
           <div class="destaque-dados">
             <StatCallout
               value={`${r.dados?.interacoesDireita?.toLocaleString('pt-BR')}%`}
               label={`Interações da direita, semana ${r.edicao}`}
+              legenda="ao-lado"
             />
             {r.dados?.interacoesEsquerda != null && r.dados?.interacoesDireita != null && (
               <ComparisonBar
@@ -96,7 +118,7 @@ const camadas = [
   <section class="metodo band-block">
     <div class="container">
       <span class="mono eyebrow">Como funciona</span>
-      <h2>Três camadas</h2>
+      <h2 class="type-fa">Três camadas de análise</h2>
       <div class="camadas">
         {
           camadas.map((c) => (
@@ -112,36 +134,25 @@ const camadas = [
   </section>
 
   {
-    anteriores.length > 0 && (
+    anterior && (
       <section class="edicoes">
         <div class="container">
           <div class="edicoes-head">
             <div>
               <span class="mono eyebrow">Acervo</span>
-              <h2>Edições anteriores</h2>
+              <h2 class="type-fa">Edição anterior</h2>
             </div>
             <Button href="/relatorios" variant="ghost">
-              Ver todas
+              Ver todos
             </Button>
           </div>
           <div class="edicoes-grid">
-            {anteriores.map((rel) => (
-              <ReportCard relatorio={rel} />
-            ))}
+            <ReportCard relatorio={anterior} />
           </div>
         </div>
       </section>
     )
   }
-
-  <section class="recorte">
-    <div class="container recorte-inner">
-      <div class="plataformas">
-        {AMOSTRA.plataformas.map((p) => <Badge tone="cream">{p}</Badge>)}
-      </div>
-      <span class="mono tabular perfis">{AMOSTRA.perfis} perfis monitorados</span>
-    </div>
-  </section>
 </Base>
 
 <style>
@@ -151,14 +162,34 @@ const camadas = [
   }
 
   .hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  .hero-texto {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
     align-items: flex-start;
+    min-width: 0;
+  }
+
+  .hero-blocos {
+    min-width: 0;
+  }
+
+  @media (max-width: 860px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-7);
+    }
   }
 
   .kicker {
-    color: var(--sky-blue);
+    /* creme em vez de azul-céu: 11,76:1 (AAA) */
+    color: var(--cream);
   }
 
   .hero h1 {
@@ -169,7 +200,7 @@ const camadas = [
     font-size: var(--type-subtitle-size);
     font-weight: 400;
     line-height: 1.4;
-    color: var(--sky-blue);
+    color: var(--cream);
     max-width: 52ch;
   }
 
@@ -206,9 +237,17 @@ const camadas = [
 
   .destaque-texto h2 {
     max-width: 26ch;
-    /* menor que o h2 padrão — ao lado do StatCallout, o tamanho de título
-       normal deixava a composição pesada demais */
     font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+  }
+
+  .destaque-texto h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .destaque-texto h2 a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
 
   .destaque-dados {
@@ -224,7 +263,8 @@ const camadas = [
 
   .eyebrow {
     display: block;
-    color: var(--amber-dark);
+    /* navy sobre cinza-névoa: 8,22:1 — o âmbar-escuro reprovava a 3,44:1 */
+    color: var(--navy);
     margin-bottom: var(--space-3);
   }
 
@@ -251,7 +291,7 @@ const camadas = [
     line-height: 1.5;
   }
 
-  /* ---------- edições anteriores ---------- */
+  /* ---------- edição anterior ---------- */
   .edicoes {
     padding-block: var(--space-8);
   }
@@ -265,32 +305,13 @@ const camadas = [
     margin-bottom: var(--space-6);
   }
 
+  .edicoes-head .eyebrow {
+    color: var(--amber-dark);
+  }
+
   .edicoes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--space-5);
-  }
-
-  /* ---------- recorte ---------- */
-  .recorte {
-    padding-block: var(--space-7);
-  }
-
-  .recorte-inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-  }
-
-  .plataformas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-  }
-
-  .perfis {
-    color: var(--graphite);
   }
 </style>

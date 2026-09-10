@@ -10,10 +10,10 @@ plataformas:
   - "Instagram"
   - "TikTok"
 temas:
-  - "Conflito político"
-  - "Conflito moral"
+  - "Político"
+  - "Moral"
   - "Disputas sociais"
-  - "Conflito econômico"
+  - "Econômico"
 perfisMonitorados: 162
 dados:
   interacoesEsquerda: 38.8

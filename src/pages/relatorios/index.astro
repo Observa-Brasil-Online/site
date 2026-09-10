@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Button from '../../components/Button.astro';
 import ReportCard from '../../components/ReportCard.astro';
 import { getRelatoriosOrdenados } from '../../lib/relatorios';
 
@@ -21,7 +20,7 @@ const temas = [...temasSet].sort().map((v) => ({ valor: v, rotulo: v }));
 const grupos = [
   { chave: 'semana', nome: 'Semana', todos: 'Todas', opcoes: semanas },
   { chave: 'plataforma', nome: 'Plataforma', todos: 'Todas', opcoes: plataformas },
-  { chave: 'tema', nome: 'Tema', todos: 'Todos', opcoes: temas },
+  { chave: 'tema', nome: 'Temas', todos: 'Todos', opcoes: temas },
 ].filter((g) => g.opcoes.length > 0);
 ---
 
@@ -48,6 +47,7 @@ const grupos = [
                 <span class="estado mono" data-estado>
                   {g.todos}
                 </span>
+                <span class="seta" aria-hidden="true" />
               </summary>
               <div class="painel">
                 {g.opcoes.map((o) => (
@@ -60,13 +60,21 @@ const grupos = [
             </details>
           ))
         }
-        <button type="button" id="limpar-filtros" class="limpar mono">
-          Limpar
-        </button>
+
+        <div class="acoes">
+          <button type="button" id="aplicar-filtros" class="aplicar mono" disabled>
+            Aplicar
+          </button>
+          <button type="button" id="limpar-filtros" class="limpar mono">
+            Limpar
+          </button>
+        </div>
       </div>
 
+      <p class="resultado mono tabular" id="resultado" aria-live="polite"></p>
+
       <div class="cards" id="lista-relatorios">
-        {relatorios.map((r) => <ReportCard relatorio={r} />)}
+        {relatorios.map((r) => <ReportCard relatorio={r} mostrarTags />)}
       </div>
 
       <p class="vazio mono" id="estado-vazio" hidden>
@@ -81,6 +89,33 @@ const grupos = [
   const detalhes = [...raiz.querySelectorAll<HTMLDetailsElement>('details.filtro')];
   const cards = [...document.querySelectorAll<HTMLElement>('#lista-relatorios .report-card')];
   const vazio = document.getElementById('estado-vazio')!;
+  const resultado = document.getElementById('resultado')!;
+  const btnAplicar = document.getElementById('aplicar-filtros') as HTMLButtonElement;
+  const btnLimpar = document.getElementById('limpar-filtros') as HTMLButtonElement;
+
+  type Selecao = Record<string, string[]>;
+
+  /** O que está de fato filtrando a lista. Marcar caixa não mexe aqui — só o Aplicar. */
+  let aplicado: Selecao = { semana: [], plataforma: [], tema: [] };
+
+  /** O que está marcado nos painéis agora. */
+  function marcado(): Selecao {
+    const s: Selecao = { semana: [], plataforma: [], tema: [] };
+    for (const grupo of Object.keys(s)) {
+      s[grupo] = [
+        ...raiz.querySelectorAll<HTMLInputElement>(`input[data-grupo="${grupo}"]:checked`),
+      ].map((i) => i.value);
+    }
+    return s;
+  }
+
+  const mesmo = (a: string[], b: string[]) =>
+    a.length === b.length && [...a].sort().join('|') === [...b].sort().join('|');
+
+  const temPendencia = () => {
+    const m = marcado();
+    return Object.keys(aplicado).some((g) => !mesmo(m[g], aplicado[g]));
+  };
 
   // clique fora fecha qualquer painel aberto
   document.addEventListener('click', (e) => {
@@ -102,40 +137,37 @@ const grupos = [
     });
   });
 
-  function selecaoDoGrupo(grupo: string): string[] {
-    return [...raiz.querySelectorAll<HTMLInputElement>(`input[data-grupo="${grupo}"]:checked`)].map(
-      (i) => i.value
-    );
-  }
-
-  function atualizarEstados() {
+  /** Rótulo do gatilho reflete o MARCADO; o âmbar reflete o APLICADO. */
+  function atualizarGatilhos() {
+    const m = marcado();
     detalhes.forEach((d) => {
       const grupo = d.dataset.grupo!;
-      const selecao = selecaoDoGrupo(grupo);
+      const sel = m[grupo] ?? [];
       const estado = d.querySelector('[data-estado]')!;
       estado.textContent =
-        selecao.length === 0
+        sel.length === 0
           ? (d.dataset.todos ?? 'Todos')
-          : `${selecao.length} selecionada${selecao.length > 1 ? 's' : ''}`;
+          : `${sel.length} selecionada${sel.length > 1 ? 's' : ''}`;
+      d.classList.toggle('ativo', (aplicado[grupo] ?? []).length > 0);
     });
+    btnAplicar.disabled = !temPendencia();
   }
 
-  function aplicarFiltros() {
-    const semanas = selecaoDoGrupo('semana');
-    const plataformas = selecaoDoGrupo('plataforma');
-    const temasSel = selecaoDoGrupo('tema');
+  function aplicar() {
+    aplicado = marcado();
 
     let visiveis = 0;
-
     cards.forEach((card) => {
       const edicao = card.dataset.edicao ?? '';
       const cardPlataformas = (card.dataset.plataformas ?? '').split('|');
       const cardTemas = (card.dataset.temas ?? '').split('|');
 
-      const passaSemana = semanas.length === 0 || semanas.includes(edicao);
+      const passaSemana = aplicado.semana.length === 0 || aplicado.semana.includes(edicao);
       const passaPlataforma =
-        plataformas.length === 0 || plataformas.some((p) => cardPlataformas.includes(p));
-      const passaTema = temasSel.length === 0 || temasSel.some((t) => cardTemas.includes(t));
+        aplicado.plataforma.length === 0 ||
+        aplicado.plataforma.some((p) => cardPlataformas.includes(p));
+      const passaTema =
+        aplicado.tema.length === 0 || aplicado.tema.some((t) => cardTemas.includes(t));
 
       const passa = passaSemana && passaPlataforma && passaTema;
       card.hidden = !passa;
@@ -143,16 +175,28 @@ const grupos = [
     });
 
     vazio.hidden = visiveis > 0;
-    atualizarEstados();
+
+    // anuncia uma vez só, no clique — não a cada caixa marcada
+    const filtrando = Object.values(aplicado).some((v) => v.length > 0);
+    resultado.textContent = filtrando
+      ? `${visiveis} ${visiveis === 1 ? 'edição encontrada' : 'edições encontradas'}`
+      : '';
+
+    detalhes.forEach((d) => (d.open = false));
+    atualizarGatilhos();
   }
 
-  raiz.addEventListener('change', aplicarFiltros);
+  // marcar caixa não filtra nada — só acende o Aplicar
+  raiz.addEventListener('change', atualizarGatilhos);
 
-  document.getElementById('limpar-filtros')?.addEventListener('click', () => {
+  btnAplicar.addEventListener('click', aplicar);
+
+  btnLimpar.addEventListener('click', () => {
     raiz.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((i) => (i.checked = false));
-    detalhes.forEach((d) => (d.open = false));
-    aplicarFiltros();
+    aplicar();
   });
+
+  atualizarGatilhos();
 </script>
 
 <style>
@@ -161,13 +205,14 @@ const grupos = [
   }
 
   .kicker {
-    color: var(--sky-blue);
+    /* creme, não azul-céu: 11,76:1 (AAA) */
+    color: var(--cream);
     display: block;
     margin-bottom: var(--space-2);
   }
 
   .contagem {
-    color: var(--sky-blue);
+    color: var(--cream);
     margin-top: var(--space-3);
   }
 
@@ -181,7 +226,7 @@ const grupos = [
     flex-wrap: wrap;
     align-items: flex-start;
     gap: var(--space-3);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-5);
     padding-bottom: var(--space-5);
     border-bottom: var(--border-thin) solid var(--mist-gray);
   }
@@ -219,12 +264,35 @@ const grupos = [
     text-transform: uppercase;
   }
 
-  .filtro[open] summary {
-    background: var(--navy);
+  /* seta em CSS puro — o manual não define sistema de ícones */
+  .seta {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--navy);
+    margin-left: var(--space-1);
+    transition: transform var(--ease);
   }
-  .filtro[open] .rotulo,
-  .filtro[open] .estado {
-    color: var(--cream);
+
+  .filtro[open] .seta {
+    transform: rotate(180deg);
+  }
+
+  /* Âmbar = filtro APLICADO, não apenas marcado.
+     Preenchimento âmbar com texto grafite: 7,35:1 (AAA). */
+  .filtro.ativo summary {
+    background: var(--amber);
+    border-color: var(--navy);
+  }
+
+  .filtro.ativo .rotulo,
+  .filtro.ativo .estado {
+    color: var(--graphite);
+  }
+
+  .filtro.ativo .seta {
+    border-top-color: var(--graphite);
   }
 
   .painel {
@@ -254,8 +322,31 @@ const grupos = [
     accent-color: var(--navy);
   }
 
+  .acoes {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .aplicar {
+    padding: var(--space-2) var(--space-5);
+    border: var(--border-thin) solid var(--navy);
+    border-radius: var(--radius);
+    background: var(--navy);
+    color: var(--cream);
+    font-size: 0.75rem;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity var(--ease);
+  }
+
+  .aplicar:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
   .limpar {
-    align-self: center;
     background: none;
     border: none;
     color: var(--graphite);
@@ -273,6 +364,12 @@ const grupos = [
   }
 
   /* ---------- lista ---------- */
+  .resultado {
+    color: var(--graphite);
+    margin-bottom: var(--space-4);
+    min-height: 1em;
+  }
+
   .cards {
     display: flex;
     flex-direction: column;

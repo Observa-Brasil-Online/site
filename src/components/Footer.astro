@@ -1,6 +1,7 @@
 ---
 import Symbol from './Symbol.astro';
-import { SITE, AMOSTRA } from '../config';
+import SocialIcon from './SocialIcon.astro';
+import { SITE, AMOSTRA, NAV, REDES } from '../config';
 
 const year = new Date().getFullYear();
 
@@ -8,51 +9,99 @@ const year = new Date().getFullYear();
 const plataformas = new Intl.ListFormat('pt-BR', { style: 'long', type: 'conjunction' }).format(
   AMOSTRA.plataformas
 );
+
+// só entra rede com link — botão morto num site público é pior que botão ausente
+const redes = REDES.filter((r) => r.url);
 ---
 
 <footer class="site-footer band-dark">
-  <div class="container inner">
-    <Symbol variant="negative" size={44} />
+  <div class="container">
+    <div class="colunas">
+      <div class="institucional">
+        <Symbol variant="negative" size={40} />
+        <p class="assinatura mono">
+          {SITE.endorsement} · {SITE.institution} · {SITE.university}
+        </p>
+        <p class="recorte">
+          A série mede o debate entre {AMOSTRA.perfis} perfis monitorados de lideranças
+          políticas, influenciadores e jornalistas em {plataformas}.
+          Não é uma medida da opinião pública brasileira.
+        </p>
+      </div>
 
-    <p class="signature mono">
-      {SITE.endorsement} · {SITE.institution} · {SITE.university}
-    </p>
+      <div class="secundaria">
+        <nav aria-label="Navegação do rodapé">
+          <span class="rotulo mono">Navegação</span>
+          <ul>
+            {NAV.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+          </ul>
+        </nav>
 
-    <p class="scope">
-      A série mede o debate entre {AMOSTRA.perfis} perfis monitorados de lideranças
-      políticas, influenciadores e jornalistas em {plataformas}.
-      Não é uma medida da opinião pública brasileira.
-    </p>
+        {
+          redes.length > 0 && (
+            <div class="redes">
+              <span class="rotulo mono">Nos sigam nas redes:</span>
+              <ul>
+                {redes.map((r) => (
+                  <li>
+                    <a
+                      href={r.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${SITE.name} no ${r.label}`}
+                    >
+                      <SocialIcon rede={r.rede} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </div>
 
-    <p class="contact mono">
-      <a href={`mailto:${SITE.contact}`}>{SITE.contact}</a>
-      <span aria-hidden="true">·</span>
-      <span>{year}</span>
-    </p>
+    <p class="base mono">© {year} OBSERVA</p>
   </div>
 </footer>
 
 <style>
   .site-footer {
     margin-top: var(--space-9);
-    padding-block: var(--space-7);
+    padding-block: var(--space-8) var(--space-6);
   }
 
-  .inner {
+  .colunas {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  @media (max-width: 700px) {
+    .colunas {
+      grid-template-columns: 1fr;
+      gap: var(--space-7);
+    }
+  }
+
+  /* ---------- coluna institucional ---------- */
+  .institucional {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: var(--space-4);
-    text-align: center;
+    align-items: flex-start;
   }
 
-  .signature {
-    color: var(--sky-blue);
+  .assinatura {
+    /* creme, não azul-céu: 11,76:1 (AAA) */
+    color: var(--cream);
     margin: 0;
+    max-width: 46ch;
   }
 
-  .scope {
-    max-width: 60ch;
+  .recorte {
+    max-width: 52ch;
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.55;
@@ -60,22 +109,73 @@ const plataformas = new Intl.ListFormat('pt-BR', { style: 'long', type: 'conjunc
     opacity: 0.82;
   }
 
-  .contact {
+  /* ---------- coluna de navegação e redes ---------- */
+  .secundaria {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .rotulo {
+    display: block;
+    color: var(--sky-blue);
+    margin-bottom: var(--space-3);
+  }
+
+  .secundaria ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .secundaria nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .secundaria nav a {
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+
+  .secundaria nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .redes ul {
     display: flex;
     flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .redes a {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    gap: var(--space-2);
-    margin: 0;
+    width: 40px;
+    height: 40px;
+    color: var(--cream);
+    border: var(--border-thin) solid var(--cream);
+    border-radius: var(--radius);
+    transition: background var(--ease), color var(--ease);
+  }
+
+  .redes a:hover {
+    background: var(--cream);
+    color: var(--navy);
+  }
+
+  /* ---------- linha de base ---------- */
+  .base {
+    /* base.css tem `p { max-width: var(--prose-max) }` global — sem isso a
+       linha divisória ficava presa a 68ch em vez da largura das duas colunas */
+    max-width: none;
+    margin: var(--space-7) 0 0;
+    padding-top: var(--space-4);
+    border-top: var(--border-thin) solid rgba(251, 247, 239, 0.22);
     color: var(--sky-blue);
-  }
-
-  .contact a {
-    color: inherit;
-    text-decoration: none;
-    border-bottom: 1px solid currentColor;
-  }
-
-  .contact a:hover {
-    opacity: 0.8;
   }
 </style>

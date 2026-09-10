@@ -30,14 +30,14 @@ const fmt = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 
 ---
 
 <figure class="cmp">
-  <figcaption class="labels">
-    <span class="tabular">{leftLabel} · {fmt(leftValue)}%</span>
-    <span class="tabular">{fmt(rightValue)}% · {rightLabel}</span>
-  </figcaption>
   <div class="track" role="img" aria-label={`${caption}: ${leftLabel} ${fmt(leftValue)}%, ${rightLabel} ${fmt(rightValue)}%`}>
     <div class="left" style={`width:${leftPct}%`}></div>
     <div class="right" style={`width:${100 - leftPct}%`}></div>
   </div>
+  <figcaption class="labels">
+    <span class="tabular">{leftLabel} · {fmt(leftValue)}%</span>
+    <span class="tabular">{fmt(rightValue)}% · {rightLabel}</span>
+  </figcaption>
 </figure>
 
 <style>
@@ -50,7 +50,7 @@ const fmt = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 
     display: flex;
     justify-content: space-between;
     gap: var(--space-4);
-    margin-bottom: var(--space-2);
+    margin-top: var(--space-2);
     font-family: var(--font-mono);
     /* era 0.688rem (11px) — pequeno demais como legenda de gráfico */
     font-size: 0.875rem;

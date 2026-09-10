@@ -31,6 +31,21 @@ const relatorios = defineCollection({
           publicacoesDireita: z.number().min(0).max(100).optional(),
           interacoesEsquerda: z.number().min(0).max(100).optional(),
           interacoesDireita: z.number().min(0).max(100).optional(),
+          /**
+           * Volume de publicações por plataforma (Tabela 1 do PDF). OPCIONAL:
+           * quando preenchido, a composição do hero ganha um bloco por
+           * plataforma; ausente, ela cai na versão Esquerda×Direita sem quebrar.
+           * Cada campo novo aqui é mais um minuto de transcrição por semana —
+           * por isso é opcional, e não obrigatório.
+           */
+          plataformas: z
+            .array(
+              z.object({
+                nome: z.enum(['X (Twitter)', 'Instagram', 'TikTok']),
+                publicacoes: z.number().int().nonnegative(),
+              })
+            )
+            .optional(),
         })
         .optional(),
       /** Caminho em public/, ex.: /relatorios/edicao-01.pdf */

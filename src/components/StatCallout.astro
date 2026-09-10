@@ -12,12 +12,14 @@ interface Props {
   label: string;
   tone?: 'amber' | 'navy' | 'amber-on-dark';
   size?: 'md' | 'lg';
+  /** 'abaixo' (padrão) ou 'ao-lado' — legenda alinhada à base do número */
+  legenda?: 'abaixo' | 'ao-lado';
 }
 
-const { value, label, tone = 'amber', size = 'lg' } = Astro.props;
+const { value, label, tone = 'amber', size = 'lg', legenda = 'abaixo' } = Astro.props;
 ---
 
-<div class:list={['stat', tone, size]}>
+<div class:list={['stat', tone, size, `leg-${legenda}`]}>
   <span class="value tabular">{value}</span>
   <span class="label">{label}</span>
 </div>
@@ -27,6 +29,26 @@ const { value, label, tone = 'amber', size = 'lg' } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
+  }
+
+  .leg-ao-lado {
+    flex-direction: row;
+    /* centralizado, não pela linha de base — os dois elementos alinham pelo
+       meio da própria altura, não pelo pé do número grande */
+    align-items: center;
+    gap: var(--space-4);
+    /* nowrap no container: os dois ficam na mesma linha sempre.
+       O label pode quebrar dentro de si mesmo (max-width abaixo). */
+    flex-wrap: nowrap;
+  }
+
+  .leg-ao-lado .value {
+    flex: none;
+  }
+
+  .leg-ao-lado .label {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .value {

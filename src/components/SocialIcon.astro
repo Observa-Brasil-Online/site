@@ -1,0 +1,68 @@
+---
+/**
+ * Ícones das redes do projeto.
+ *
+ * Desvio consciente da regra do manual ("plataformas sempre como texto mono,
+ * nunca como logo"): aquela regra trata das plataformas *monitoradas*, que são
+ * objeto de estudo. Estes são os perfis do próprio Brasil Online.
+ *
+ * Desenhados com formas geométricas simples em vez de logos traçados — casa com
+ * o símbolo da marca e evita depender de biblioteca de ícones.
+ */
+interface Props {
+  rede: string;
+  size?: number;
+}
+
+const { rede, size = 20 } = Astro.props;
+---
+
+<svg
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {
+    rede === 'instagram' && (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" />
+      </>
+    )
+  }
+  {
+    rede === 'linkedin' && (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="2.5" />
+        <line x1="7.5" y1="10.5" x2="7.5" y2="17" />
+        <circle cx="7.5" cy="7" r="1.1" fill="currentColor" stroke="none" />
+        <path d="M11.5 17v-3.6a2.4 2.4 0 0 1 4.8 0V17" />
+        <line x1="11.5" y1="10.5" x2="11.5" y2="17" />
+      </>
+    )
+  }
+  {
+    rede === 'tiktok' && (
+      <>
+        <path d="M14 4v10.2a3.4 3.4 0 1 1-2.8-3.35" />
+        <path d="M14 4a4.6 4.6 0 0 0 4.4 4.2" />
+      </>
+    )
+  }
+  {
+    rede === 'x' && (
+      <>
+        <line x1="4.5" y1="4.5" x2="19.5" y2="19.5" />
+        <line x1="19.5" y1="4.5" x2="4.5" y2="19.5" />
+      </>
+    )
+  }
+</svg>

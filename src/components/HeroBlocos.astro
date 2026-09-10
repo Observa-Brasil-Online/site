@@ -1,0 +1,161 @@
+---
+/**
+ * Composição de blocos chapados do hero — decoração que carrega o dado da semana.
+ *
+ * Lê da edição mais recente, então se redesenha sozinha a cada edição nova.
+ * Dois níveis, com degradação graciosa:
+ *   (a) interações Esquerda × Direita — sempre presente
+ *   (b) volume por plataforma — só se `dados.plataformas` estiver preenchido
+ *
+ * Par de cores obrigatório do manual: Esquerda = Azul OBSERVA, Direita = Âmbar,
+ * nessa ordem, nunca invertido.
+ */
+interface Plataforma {
+  nome: string;
+  publicacoes: number;
+}
+interface Props {
+  esquerda: number;
+  direita: number;
+  plataformas?: readonly Plataforma[];
+  edicao: number;
+}
+
+const { esquerda, direita, plataformas, edicao } = Astro.props;
+
+const fmt = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+const fmtInt = (n: number) => n.toLocaleString('pt-BR');
+
+// abreviação para caber no bloco
+const curto = (nome: string) => (nome.startsWith('X') ? 'X' : nome);
+
+const temPlataformas = Array.isArray(plataformas) && plataformas.length > 0;
+---
+
+<figure
+  class="blocos"
+  role="img"
+  aria-label={`Semana ${edicao}: interações da esquerda ${fmt(esquerda)}%, da direita ${fmt(direita)}%.${
+    temPlataformas
+      ? ' Publicações por plataforma: ' +
+        plataformas!.map((p) => `${p.nome} ${fmtInt(p.publicacoes)}`).join(', ') +
+        '.'
+      : ''
+  }`}
+>
+  <div class="campos">
+    <div class="bloco direita" style={`flex: ${direita}`}>
+      <span class="rot mono">Direita</span>
+      <span class="val mono tabular">{fmt(direita)}%</span>
+    </div>
+    <div class="bloco esquerda" style={`flex: ${esquerda}`}>
+      <span class="rot mono">Esquerda</span>
+      <span class="val mono tabular">{fmt(esquerda)}%</span>
+    </div>
+  </div>
+
+  <div class="lateral">
+    {
+      temPlataformas ? (
+        plataformas!.map((p) => (
+          <div class="bloco plataforma" style={`flex: ${p.publicacoes}`}>
+            <span class="rot mono">{curto(p.nome)}</span>
+            <span class="val mono tabular">{fmtInt(p.publicacoes)}</span>
+          </div>
+        ))
+      ) : (
+        <>
+          <div class="bloco neutro" style="flex: 3" />
+          <div class="bloco neutro fraco" style="flex: 2" />
+        </>
+      )
+    }
+  </div>
+
+  <figcaption class="legenda mono">Interações da semana {edicao}</figcaption>
+</figure>
+
+<style>
+  .blocos {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: var(--space-3);
+    margin: 0;
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    max-height: 340px;
+  }
+
+  .campos,
+  .lateral {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-height: 0;
+  }
+
+  .bloco {
+    border-radius: var(--radius);
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 2px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .rot {
+    font-size: 0.625rem;
+    opacity: 0.85;
+  }
+
+  .val {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1rem, 2.2vw, 1.5rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-transform: none;
+  }
+
+  /* Direita = âmbar, texto grafite: 7,35:1 (AAA) */
+  .direita {
+    background: var(--data-right);
+    color: var(--graphite);
+  }
+
+  /* Esquerda = Azul OBSERVA, texto creme */
+  .esquerda {
+    background: var(--data-left);
+    color: var(--cream);
+  }
+
+  .plataforma {
+    background: rgba(251, 247, 239, 0.14);
+    color: var(--cream);
+    border: var(--border-thin) solid rgba(251, 247, 239, 0.28);
+  }
+
+  .neutro {
+    background: rgba(251, 247, 239, 0.14);
+  }
+
+  .neutro.fraco {
+    background: rgba(251, 247, 239, 0.07);
+  }
+
+  .legenda {
+    grid-column: 1 / -1;
+    color: var(--cream);
+    opacity: 0.75;
+  }
+
+  @media (max-width: 860px) {
+    .blocos {
+      aspect-ratio: 16 / 9;
+      max-height: 220px;
+    }
+  }
+</style>

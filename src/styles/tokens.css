@@ -120,8 +120,15 @@
   --space-8: 64px;
   --space-9: 96px;
 
+  /* ---------- Fonte A (FA) ----------
+     Tratamento tipográfico do headline do hero. Marcado como "FA" nos boards
+     de ajuste; qualquer título assim marcado usa a classe .type-fa. */
+  --fa-weight: 800;
+  --fa-line: 0.98;
+  --fa-tracking: -0.02em;
+
   /* ---------- forma ---------- */
-  --radius: 4px;              /* botões, badges, cards */
+  --radius: 10px;             /* botões, badges, cards — token único, testar 8px aqui */
   --radius-bar: 2px;          /* só a aresta de avanço das barras de gráfico */
   --border-thin: 1px;
   --border-amber-outline: 1pt; /* obrigatório em fill âmbar sobre fundo claro */

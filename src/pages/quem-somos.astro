@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Card from '../components/Card.astro';
 import { getCollection } from 'astro:content';
-import { SITE, AMOSTRA } from '../config';
+import { AMOSTRA } from '../config';
 
 const integrantes = await getCollection('integrantes');
 
@@ -13,11 +13,21 @@ function chaveOrdenacao(nome: string) {
   return s.toLocaleLowerCase('pt-BR');
 }
 
-const equipe = [...integrantes].sort((a, b) =>
+/**
+ * Recorte de publicação: só aparece quem devolveu as informações da ficha.
+ * `formacaoAtual` é o critério — é o único campo que todo mundo consegue
+ * preencher (Lattes nem toda pessoa tem, rede social é opcional).
+ *
+ * Enquanto os dados não voltam, PLACEHOLDER=true mantém os 41 nomes na tela
+ * para desenvolvimento. Virar false antes de publicar.
+ */
+const PLACEHOLDER = true;
+
+const todos = [...integrantes].sort((a, b) =>
   chaveOrdenacao(a.data.nome).localeCompare(chaveOrdenacao(b.data.nome), 'pt-BR')
 );
 
-const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes && !p.data.redeSocial).length;
+const equipe = PLACEHOLDER ? todos : todos.filter((p) => p.data.formacaoAtual);
 ---
 
 <Base
@@ -46,15 +56,15 @@ const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes &
         <dl>
           <div>
             <dt class="tabular">{AMOSTRA.perfis}</dt>
-            <dd>perfis monitorados</dd>
+            <dd>perfis<br />monitorados</dd>
           </div>
           <div>
             <dt class="tabular">{AMOSTRA.plataformas.length}</dt>
-            <dd>plataformas — {AMOSTRA.plataformas.join(', ')}</dd>
+            <dd>plataformas<br />{AMOSTRA.plataformas.join(', ')}</dd>
           </div>
           <div>
-            <dt class="tabular">2</dt>
-            <dd>campos em disputa — esquerda e direita, sempre comparados</dd>
+            <dt class="campos">Esquerda<br />e Direita</dt>
+            <dd>sempre<br />comparados</dd>
           </div>
         </dl>
       </Card>
@@ -63,16 +73,10 @@ const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes &
 
   <section class="equipe">
     <div class="container">
-      <span class="mono eyebrow">Equipe</span>
-      <h2>{equipe.length} pesquisadoras e pesquisadores</h2>
-      {
-        pendentes > 0 && (
-          <p class="nota-pendencia">
-            Formação, grupo, Lattes e redes sociais ainda não constam para {pendentes} pessoas da
-            equipe — a lista completa será levantada com o time de divulgação.
-          </p>
-        )
-      }
+      <div class="equipe-head">
+        <span class="mono eyebrow">Equipe</span>
+        <h2 class="type-fa">{equipe.length} pesquisadoras e pesquisadores</h2>
+      </div>
       <div class="equipe-grid">
         {
           equipe.map((p) => (
@@ -97,16 +101,6 @@ const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes &
       </div>
     </div>
   </section>
-
-  <section class="contato band-dark">
-    <div class="container">
-      <span class="mono eyebrow">Contato</span>
-      <p class="lede">
-        Dúvidas, correções ou proposta de parceria:
-        <a href={`mailto:${SITE.contact}`}>{SITE.contact}</a>
-      </p>
-    </div>
-  </section>
 </Base>
 
 <style>
@@ -127,7 +121,8 @@ const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes &
   }
 
   .kicker {
-    color: var(--sky-blue);
+    /* creme: 11,76:1 (AAA) */
+    color: var(--cream);
     display: block;
     margin-bottom: var(--space-3);
   }
@@ -140,52 +135,64 @@ const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes &
   .lede {
     font-size: 1.0625rem;
     line-height: 1.55;
-    color: var(--sky-blue);
+    color: var(--cream);
     max-width: 52ch;
     margin-bottom: var(--space-4);
   }
 
   :global(.card-recorte) {
-    flex: 1 1 280px;
-    max-width: 340px;
+    flex: 1 1 300px;
+    max-width: 380px;
   }
 
   .card-titulo {
     display: block;
     color: var(--amber-dark);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-5);
   }
 
   dl {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-5);
   }
 
+  /* legenda ao lado do número, alinhada pela base */
   dl > div {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    flex-wrap: wrap;
+    /* centralizado, não pela linha de base — mesmo tratamento do StatCallout
+       da Home. Importa mais ainda agora que a legenda quebra em duas linhas. */
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
   }
 
+  /* 162, 3 e "Esquerda e Direita" — mesma forma e estilo, sem exceção para o
+     item que é frase em vez de número */
   dt {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 1.75rem;
+    font-size: 2.5rem;
     color: var(--navy);
     line-height: 1;
+    letter-spacing: -0.02em;
   }
 
   dd {
     margin: 0;
     font-size: 0.875rem;
     color: var(--graphite);
+    text-align: left;
   }
 
   /* ---------- equipe ---------- */
   .equipe {
     padding-block: var(--space-8);
+  }
+
+  .equipe-head {
+    margin-bottom: var(--space-6);
   }
 
   .eyebrow {
@@ -194,19 +201,10 @@ const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes &
     margin-bottom: var(--space-3);
   }
 
-  .nota-pendencia {
-    margin-top: var(--space-3);
-    font-size: 0.875rem;
-    color: var(--graphite);
-    opacity: 0.75;
-    max-width: 60ch;
-  }
-
   .equipe-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: var(--space-4);
-    margin-top: var(--space-6);
   }
 
   .pessoa {
@@ -246,21 +244,5 @@ const pendentes = equipe.filter((p) => !p.data.formacaoAtual && !p.data.lattes &
 
   .links a:hover {
     text-decoration: underline;
-  }
-
-  /* ---------- contato ---------- */
-  .contato {
-    padding-block: var(--space-7);
-  }
-
-  .contato .lede {
-    color: var(--sky-blue);
-    margin: 0;
-  }
-
-  .contato a {
-    color: var(--cream);
-    text-decoration: underline;
-    text-underline-offset: 3px;
   }
 </style>

@@ -108,6 +108,14 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
+/* Fonte A — o tratamento do headline do hero, aplicado onde os boards marcam "FA" */
+.type-fa {
+  font-family: var(--font-display);
+  font-weight: var(--fa-weight);
+  line-height: var(--fa-line);
+  letter-spacing: var(--fa-tracking);
+}
+
 /* ---------- acessibilidade ---------- */
 .skip-link {
   position: absolute;

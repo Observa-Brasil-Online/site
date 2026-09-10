@@ -6,9 +6,11 @@ import { formatarPeriodo } from '../lib/relatorios';
 
 interface Props {
   relatorio: Relatorio;
+  /** Home não exibe tags; Relatórios exibe, no canto inferior, ao lado dos botões */
+  mostrarTags?: boolean;
 }
 
-const { relatorio } = Astro.props;
+const { relatorio, mostrarTags = false } = Astro.props;
 const r = relatorio.data;
 ---
 
@@ -24,13 +26,20 @@ const r = relatorio.data;
     <p class="chamada">{r.chamada}</p>
   </div>
 
-  <div class="tags">
-    {r.temas.slice(0, 3).map((t) => <Badge tone="cream">{t}</Badge>)}
-  </div>
-
-  <div class="actions">
-    <Button href={`/relatorios/${relatorio.id}`} variant="ghost" size="sm">Ver edição</Button>
-    <Button href={r.pdf} variant="primary" size="sm" download>Baixar PDF</Button>
+  <div class="rodape-card">
+    <div class="actions">
+      <Button href={r.pdf} variant="primary" size="sm" download>Baixar PDF</Button>
+      <Button href={`/relatorios/${relatorio.id}`} variant="ghost" size="sm">Ver edição</Button>
+    </div>
+    {
+      mostrarTags && (
+        <div class="tags-canto">
+          {r.temas.slice(0, 3).map((t) => (
+            <Badge tone="cream">{t}</Badge>
+          ))}
+        </div>
+      )
+    }
   </div>
 </article>
 
@@ -68,23 +77,33 @@ const r = relatorio.data;
     text-decoration: underline;
   }
 
+  /* corre a largura toda do card, respeitando o padding do contêiner */
   .chamada {
     font-size: 0.9375rem;
     line-height: 1.5;
     color: var(--graphite);
-    max-width: 62ch;
+    max-width: none;
   }
 
-  .tags {
+  .rodape-card {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2);
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: auto;
   }
 
   .actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-    margin-top: auto;
+  }
+
+  .tags-canto {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
   }
 </style>

@@ -5,24 +5,34 @@ import Symbol from './Symbol.astro';
  * Assinatura OBSERVA — endosso institucional.
  * OBRIGATÓRIA em toda página. A única exceção prevista pelo manual é o símbolo
  * isolado como avatar de perfil.
+ *
+ * Wordmark e assinatura ficam na mesma linha, no mesmo tamanho: o destaque vem
+ * do peso (800 vs 400), não do corpo. A altura acompanha o símbolo + 2px.
  */
 interface Props {
   orientation?: 'horizontal' | 'vertical';
   onDark?: boolean;
   /** Vira link para a home quando true */
   asLink?: boolean;
+  /** Altura do símbolo em px — o texto acompanha */
+  size?: number;
 }
 
-const { orientation = 'horizontal', onDark = false, asLink = false } = Astro.props;
+const { orientation = 'horizontal', onDark = false, asLink = false, size = 34 } = Astro.props;
 const Tag = asLink ? 'a' : 'div';
+
+const alturaSimbolo = orientation === 'vertical' ? 56 : size;
+// tipografia simétrica ao símbolo, 2px maior
+const corpoTexto = alturaSimbolo + 2;
 ---
 
 <Tag
   class:list={['lockup', orientation, { 'on-dark': onDark }]}
+  style={`--corpo: ${corpoTexto}px`}
   {...asLink ? { href: '/', 'aria-label': 'Brasil Online — página inicial' } : {}}
 >
-  <Symbol variant={onDark ? 'negative' : 'primary'} size={orientation === 'vertical' ? 56 : 34} />
-  <span class="text">
+  <Symbol variant={onDark ? 'negative' : 'primary'} size={alturaSimbolo} />
+  <span class="frase">
     <span class="wordmark">BRASIL ONLINE</span>
     <span class="signature">Uma série do OBSERVA</span>
   </span>
@@ -43,27 +53,37 @@ const Tag = asLink ? 'a' : 'div';
     text-align: center;
   }
 
-  .text {
+  /* Frase uniforme em tamanho: o título pesa, o subtítulo não. */
+  .frase {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: baseline;
+    gap: 0.5ch;
     min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .vertical .frase {
+    justify-content: center;
+  }
+
+  /* Frase uniforme em tamanho e família: wordmark e assinatura no mesmo corpo,
+     ambos em Archivo. O destaque vem só do peso (800 vs 400). */
+  .wordmark,
+  .signature {
+    font-family: var(--font-display);
+    font-size: calc(var(--corpo) * 0.55);
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .wordmark {
-    font-family: var(--font-display);
     font-weight: 800;
-    font-size: 1.1875rem;
     letter-spacing: -0.02em;
-    line-height: 1;
     color: var(--navy);
   }
 
   .signature {
-    font-family: var(--font-mono);
-    font-size: var(--type-signature-size);
-    font-weight: var(--type-signature-weight);
-    line-height: var(--type-signature-line);
+    font-weight: 400;
     letter-spacing: var(--type-signature-tracking);
     text-transform: uppercase;
     color: var(--graphite);
@@ -72,11 +92,8 @@ const Tag = asLink ? 'a' : 'div';
   .on-dark .wordmark {
     color: var(--cream);
   }
+  /* creme em vez de azul-céu: 11,76:1 (AAA) contra os 5,65:1 anteriores */
   .on-dark .signature {
-    color: var(--sky-blue);
-  }
-
-  .vertical .wordmark {
-    font-size: 1.375rem;
+    color: var(--cream);
   }
 </style>
