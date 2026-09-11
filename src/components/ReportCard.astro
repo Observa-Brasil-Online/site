@@ -44,6 +44,13 @@ const r = relatorio.data;
 </article>
 
 <style>
+  /* [hidden] tem baixa especificidade no UA stylesheet — sem isso, o filtro da
+     tela de Relatórios marca hidden=true mas o card continua visível porque
+     ".report-card { display: flex }" ganha da regra nativa. */
+  .report-card[hidden] {
+    display: none;
+  }
+
   .report-card {
     display: flex;
     flex-direction: column;

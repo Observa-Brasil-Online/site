@@ -161,6 +161,17 @@ Direção vinda dos prints de referência (Realtime Colors). Aprovados com as co
 
 Não entram agora; registradas para não se perder.
 
+- **Divulgação com o link do `workers.dev` até o domínio da UFABC resolver** (Lucas, 2026-09-10):
+  ok divulgar publicamente com `https://site-observa.lucas360oliveira23.workers.dev` desde já —
+  quando `labobserva.pesquisa.ufabc.edu.br` for liberado, ele entra como Custom Domain no painel
+  Cloudflare e os dois endereços passam a funcionar ao mesmo tempo (nenhum link antigo quebra).
+  Pendências a revisitar nessa hora:
+  - Considerar redirect do `workers.dev` para o domínio da UFABC, se o Lucas quiser um único
+    endereço "oficial" dali pra frente (opcional — os dois podem conviver para sempre).
+  - Enquanto isso, existe um descompasso cosmético: `astro.config.mjs` já declara `site` como o
+    domínio da UFABC, então OG tags/sitemap apontam pra lá mesmo o site sendo servido no
+    `workers.dev` por enquanto. Não quebra nada, só deixa o preview de link em redes sociais
+    mostrando a URL "errada" até a virada.
 - **Carrossel de edições anteriores na Home** — substituir o card único de "Edição anterior" por um
   carrossel quando houver acervo suficiente (Lucas, 2026-09-10).
 - **Tratamento próprio das tags de tema** nas telas de Relatórios e Relatório-detalhe — ideia do

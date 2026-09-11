@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // O domínio definitivo é o da UFABC. Até a FBC liberar o apontamento de DNS,
 // o site roda numa URL provisória do Cloudflare Pages — trocar aqui na virada.
@@ -10,6 +11,12 @@ export default defineConfig({
     // URLs sem barra final: /relatorios, não /relatorios/
     format: 'file',
   },
+  integrations: [
+    sitemap({
+      // /kit é o espécime interno (já noindex); /404 não é uma página real
+      filter: (page) => !page.includes('/kit') && !page.includes('/404'),
+    }),
+  ],
   vite: {
     server: {
       // permite acessar o dev server por um túnel (cloudflared/ngrok) para

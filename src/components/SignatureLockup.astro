@@ -96,4 +96,22 @@ const corpoTexto = alturaSimbolo + 2;
   .on-dark .signature {
     color: var(--cream);
   }
+
+  /* Em telas estreitas, "Uma série do Brasil Online" não cabe ao lado do
+     wordmark sem estourar a largura do frame — nowrap fazia o texto vazar
+     pra fora em vez de quebrar. Empilha e libera a quebra de linha. */
+  @media (max-width: 480px) {
+    .lockup:not(.vertical) {
+      min-width: 0;
+    }
+    .lockup:not(.vertical) .frase {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    .lockup:not(.vertical) .wordmark,
+    .lockup:not(.vertical) .signature {
+      white-space: normal;
+    }
+  }
 </style>

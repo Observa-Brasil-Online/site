@@ -314,6 +314,9 @@ const grupos = [
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    /* alvo de toque ≥24px (WCAG 2.5.8) — sem isso o label media só 22px de
+       altura em mobile, abaixo do mínimo AA */
+    min-height: 32px;
     font-size: 0.875rem;
     cursor: pointer;
   }

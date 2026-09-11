@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+---
+
+<Base title="Página não encontrada" description="Essa página não existe ou foi movida.">
+  <Fragment slot="head">
+    <meta name="robots" content="noindex" />
+  </Fragment>
+
+  <section class="erro band-dark">
+    <div class="container erro-inner">
+      <span class="mono kicker">Erro 404</span>
+      <h1>Essa página não existe</h1>
+      <p class="lede">
+        O link pode estar desatualizado ou a página foi movida. Os relatórios semanais continuam
+        todos no acervo.
+      </p>
+      <div class="actions">
+        <Button variant="amber" href="/">Voltar ao início</Button>
+        <Button variant="ghost-dark" href="/relatorios">Ver relatórios</Button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .erro {
+    padding-block: var(--space-9);
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .erro-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    align-items: flex-start;
+  }
+
+  .kicker {
+    color: var(--cream);
+  }
+
+  .erro h1 {
+    max-width: 16ch;
+  }
+
+  .lede {
+    font-size: var(--type-subtitle-size);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--cream);
+    max-width: 48ch;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+</style>

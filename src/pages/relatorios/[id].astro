@@ -25,7 +25,7 @@ const urlPagina = new URL(Astro.url.pathname, Astro.site).toString();
 const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
 ---
 
-<Base title={r.titulo} description={r.chamada}>
+<Base title={r.titulo} description={r.chamada} ogImage={`/og/${relatorio.id}.png`}>
   <section class="hero-relatorio band-dark">
     <div class="container">
       <a class="voltar mono" href="/relatorios">← Voltar para Relatórios</a>
@@ -110,9 +110,11 @@ const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
 
   .voltar {
     display: inline-block;
+    /* alvo de toque ≥24px (WCAG 2.5.8) — texto sozinho media só 16px */
+    padding-block: var(--space-2);
+    margin-block: calc(var(--space-2) * -1) calc(var(--space-5) - var(--space-2));
     color: var(--sky-blue);
     text-decoration: none;
-    margin-bottom: var(--space-5);
   }
   .voltar:hover {
     text-decoration: underline;
@@ -158,6 +160,31 @@ const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
     max-width: var(--prose-max);
   }
 
+  .apresentacao :global(ul) {
+    margin-bottom: var(--space-5);
+    max-width: var(--prose-max);
+    padding-left: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .apresentacao :global(li) {
+    line-height: 1.55;
+  }
+
+  .apresentacao :global(li > ul) {
+    margin-top: var(--space-2);
+    margin-bottom: 0;
+  }
+
+  .apresentacao :global(em) {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--graphite);
+    opacity: 0.75;
+  }
+
   .sidebar {
     display: flex;
     flex-direction: column;
@@ -190,7 +217,10 @@ const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
     text-decoration: none;
     background: none;
     border: none;
-    padding: 0;
+    /* alvo de toque ≥24px (WCAG 2.5.8) — sem padding, media 17–20px.
+       Sem compensação de margem negativa: numa lista vertical apertada isso
+       fazia os alvos se sobreporem (testado e revertido). */
+    padding-block: var(--space-2);
     cursor: pointer;
     text-align: left;
   }

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /kit
+
+Sitemap: https://labobserva.pesquisa.ufabc.edu.br/sitemap-index.xml
