@@ -16,9 +16,21 @@ interface Props {
   asLink?: boolean;
   /** Altura do símbolo em px — o texto acompanha */
   size?: number;
+  /** Esconde a linha de assinatura, deixa só o wordmark (uso: header) */
+  somenteWordmark?: boolean;
+  /** Inverte qual nome pesa: "Brasil Online" como wordmark, "Uma série do
+   * OBSERVA" como assinatura — o oposto do padrão (uso: capa da Home) */
+  wordmarkBrasilOnline?: boolean;
 }
 
-const { orientation = 'horizontal', onDark = false, asLink = false, size } = Astro.props;
+const {
+  orientation = 'horizontal',
+  onDark = false,
+  asLink = false,
+  size,
+  somenteWordmark = false,
+  wordmarkBrasilOnline = false,
+} = Astro.props;
 const Tag = asLink ? 'a' : 'div';
 
 // tamanho padrão maior no vertical (o empilhamento pede mais presença),
@@ -26,6 +38,9 @@ const Tag = asLink ? 'a' : 'div';
 const alturaSimbolo = size ?? (orientation === 'vertical' ? 56 : 34);
 // tipografia simétrica ao símbolo, 2px maior
 const corpoTexto = alturaSimbolo + 2;
+
+const marca = wordmarkBrasilOnline ? 'Brasil Online' : 'OBSERVA';
+const nomeEndosso = wordmarkBrasilOnline ? 'OBSERVA' : 'Brasil Online';
 ---
 
 <Tag
@@ -35,18 +50,22 @@ const corpoTexto = alturaSimbolo + 2;
 >
   <Symbol variant={onDark ? 'negative' : 'primary'} size={alturaSimbolo} />
   <span class="frase">
-    <span class="wordmark">OBSERVA</span>
-    <span class="signature">
-      {orientation === 'vertical' ? (
-        <>
-          Uma série do
-          <br />
-          Brasil Online
-        </>
-      ) : (
-        'Uma série do Brasil Online'
-      )}
-    </span>
+    <span class="wordmark">{marca}</span>
+    {
+      !somenteWordmark && (
+        <span class="signature">
+          {orientation === 'vertical' ? (
+            <>
+              Uma série do
+              <br />
+              {nomeEndosso}
+            </>
+          ) : (
+            `Uma série do ${nomeEndosso}`
+          )}
+        </span>
+      )
+    }
   </span>
 </Tag>
 
