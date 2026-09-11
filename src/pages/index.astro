@@ -6,6 +6,7 @@ import StatCallout from '../components/StatCallout.astro';
 import ComparisonBar from '../components/ComparisonBar.astro';
 import ReportCard from '../components/ReportCard.astro';
 import HeroBlocos from '../components/HeroBlocos.astro';
+import SignatureLockup from '../components/SignatureLockup.astro';
 import { SITE } from '../config';
 import { getRelatoriosOrdenados, formatarPeriodo } from '../lib/relatorios';
 
@@ -42,47 +43,68 @@ const camadas = [
 ---
 
 <Base title={SITE.name}>
-  <section class="hero band-dark">
-    <div class="container hero-inner">
-      <div class="hero-texto">
-        <span class="mono kicker">OBSERVA · Eleições 2026</span>
-        {
-          r ? (
-            <>
-              <h1>{r.titulo}</h1>
-              <p class="lede">{r.chamada}</p>
-              <div class="actions">
-                <Button variant="amber" href={r.pdf} download>
-                  Baixar relatório (PDF)
-                </Button>
-                <Button variant="ghost-dark" href="/relatorios">
-                  Ver todas as edições
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <h1>A eleição de 2026 também acontece no feed</h1>
-              <p class="lede">E alguém está medindo — semana a semana, até outubro.</p>
-            </>
-          )
-        }
+  <section class="capa">
+    <div class="container capa-inner">
+      <div class="capa-marca">
+        <SignatureLockup orientation="vertical" size={52} />
+        <div class="actions">
+          <Button variant="amber" href="/relatorios">
+            Ver relatórios
+          </Button>
+          <Button variant="ghost" href="/quem-somos">
+            Quem somos
+          </Button>
+        </div>
       </div>
 
-      {
-        r?.dados?.interacoesEsquerda != null && r?.dados?.interacoesDireita != null && (
-          <div class="hero-blocos">
-            <HeroBlocos
-              esquerda={r.dados.interacoesEsquerda}
-              direita={r.dados.interacoesDireita}
-              plataformas={r.dados.plataformas}
-              edicao={r.edicao}
-            />
-          </div>
-        )
-      }
+      <div class="capa-texto">
+        <h1>A eleição de 2026 também acontece no feed</h1>
+        <p class="lede">
+          O Brasil Online é um projeto do OBSERVA — Observatório de Conflitos na Internet, da UFABC.
+          Toda semana, até a eleição de outubro, medimos como os campos de esquerda e direita
+          disputam as redes sociais: quem publica, quem engaja e em torno de quais conflitos a
+          disputa se organiza.
+        </p>
+      </div>
     </div>
   </section>
+
+  {
+    r && (
+      <section class="hero band-dark">
+        <div class="container hero-inner">
+          <div class="hero-texto">
+            <span class="mono kicker">
+              Semana {r.edicao} · {formatarPeriodo(r.periodoInicio, r.periodoFim)}
+            </span>
+            <h1>{r.titulo}</h1>
+            <p class="lede">{r.chamada}</p>
+            <div class="actions">
+              <Button variant="amber" href={r.pdf} download>
+                Baixar relatório (PDF)
+              </Button>
+              <Button variant="ghost-dark" href="/relatorios">
+                Ver todas as edições
+              </Button>
+            </div>
+          </div>
+
+          {
+            r?.dados?.interacoesEsquerda != null && r?.dados?.interacoesDireita != null && (
+              <div class="hero-blocos">
+                <HeroBlocos
+                  esquerda={r.dados.interacoesEsquerda}
+                  direita={r.dados.interacoesDireita}
+                  plataformas={r.dados.plataformas}
+                  edicao={r.edicao}
+                />
+              </div>
+            )
+          }
+        </div>
+      </section>
+    )
+  }
 
   {
     r && (
@@ -156,9 +178,77 @@ const camadas = [
 </Base>
 
 <style>
-  /* ---------- hero ---------- */
+  /* ---------- capa ---------- */
+  .capa {
+    padding-block: var(--space-8);
+  }
+
+  /* mesma proporção de coluna do .hero-inner logo abaixo — mantém as duas
+     seções alinhadas verticalmente, dando simetria à página */
+  .capa-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  .capa-marca {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+
+  /* SignatureLockup vertical centraliza por padrão (uso normal: rodapé,
+     kit de marca); aqui a composição inteira é alinhada à esquerda */
+  .capa-marca :global(.lockup.vertical) {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .capa-marca :global(.lockup.vertical .frase) {
+    justify-content: flex-start;
+  }
+
+  .capa-texto {
+    text-align: left;
+  }
+
+  /* fonte menor que o padrão de h1 — aqui divide a largura com a coluna da
+     marca, o tamanho de headline cheio (--type-headline-size) quebraria o
+     layout ou forçaria min-width absurdo */
+  .capa-texto h1 {
+    font-size: clamp(1.5rem, 2.6vw, 2.125rem);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: var(--space-3);
+  }
+
+  .capa-texto .lede {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    max-width: 44ch;
+    /* .lede é compartilhado com o .hero escuro logo abaixo, onde o creme
+       faz sentido — aqui o fundo é claro, então herdar aquele creme deixaria
+       o texto quase ilegível */
+    color: var(--graphite);
+  }
+
+  @media (max-width: 700px) {
+    .capa-inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+  }
+
+  .capa-inner .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* ---------- hero (edição mais recente) ---------- */
   .hero {
-    padding-block: var(--space-9) var(--space-8);
+    padding-block: var(--space-8);
   }
 
   .hero-inner {

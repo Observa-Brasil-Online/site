@@ -18,10 +18,12 @@ interface Props {
   size?: number;
 }
 
-const { orientation = 'horizontal', onDark = false, asLink = false, size = 34 } = Astro.props;
+const { orientation = 'horizontal', onDark = false, asLink = false, size } = Astro.props;
 const Tag = asLink ? 'a' : 'div';
 
-const alturaSimbolo = orientation === 'vertical' ? 56 : size;
+// tamanho padrão maior no vertical (o empilhamento pede mais presença),
+// mas ambas as orientações respeitam `size` quando informado
+const alturaSimbolo = size ?? (orientation === 'vertical' ? 56 : 34);
 // tipografia simétrica ao símbolo, 2px maior
 const corpoTexto = alturaSimbolo + 2;
 ---
@@ -34,7 +36,17 @@ const corpoTexto = alturaSimbolo + 2;
   <Symbol variant={onDark ? 'negative' : 'primary'} size={alturaSimbolo} />
   <span class="frase">
     <span class="wordmark">OBSERVA</span>
-    <span class="signature">Uma série do Brasil Online</span>
+    <span class="signature">
+      {orientation === 'vertical' ? (
+        <>
+          Uma série do
+          <br />
+          Brasil Online
+        </>
+      ) : (
+        'Uma série do Brasil Online'
+      )}
+    </span>
   </span>
 </Tag>
 
@@ -62,18 +74,27 @@ const corpoTexto = alturaSimbolo + 2;
     flex-wrap: wrap;
   }
 
+  /* Coluna, não wrap de flex-row: sem isso, o wordmark "sobe" pra linha da
+     assinatura sempre que o item de assinatura encolhe (ex.: depois de
+     ganhar o <br/> abaixo, que reduz sua largura efetiva de item) — os dois
+     precisam ficar sempre em linhas próprias, não depender de onde o
+     wrap decide cortar. */
   .vertical .frase {
+    flex-direction: column;
     justify-content: center;
   }
 
   /* Frase uniforme em tamanho e família: wordmark e assinatura no mesmo corpo,
      ambos em Archivo. O destaque vem só do peso (800 vs 400). */
+  /* white-space normal (padrão) de propósito: quebra sozinho sempre que o
+     espaço disponível apertar, sem depender de um breakpoint de viewport —
+     útil tanto no header quanto em usos futuros com coluna estreita, como
+     a capa da Home. */
   .wordmark,
   .signature {
     font-family: var(--font-display);
     font-size: calc(var(--corpo) * 0.55);
     line-height: 1;
-    white-space: nowrap;
   }
 
   .wordmark {
@@ -97,21 +118,17 @@ const corpoTexto = alturaSimbolo + 2;
     color: var(--cream);
   }
 
-  /* Em telas estreitas, "Uma série do Brasil Online" não cabe ao lado do
-     wordmark sem estourar a largura do frame — nowrap fazia o texto vazar
-     pra fora em vez de quebrar. Empilha e libera a quebra de linha. */
+  /* Em telas estreitas, empilha wordmark e assinatura em vez de deixar os
+     dois disputarem a mesma linha — a quebra de texto em si já é resolvida
+     pelo white-space normal acima, isso aqui é só a preferência de layout. */
   @media (max-width: 480px) {
-    .lockup:not(.vertical) {
+    .lockup {
       min-width: 0;
     }
     .lockup:not(.vertical) .frase {
       flex-direction: column;
       align-items: flex-start;
       gap: 2px;
-    }
-    .lockup:not(.vertical) .wordmark,
-    .lockup:not(.vertical) .signature {
-      white-space: normal;
     }
   }
 </style>
