@@ -3,7 +3,7 @@
  * Badge — etiqueta mono de dado ou plataforma. Sempre caixa alta.
  */
 interface Props {
-  tone?: 'navy' | 'cream' | 'amber';
+  tone?: 'navy' | 'cream' | 'amber' | 'ghost-dark';
   class?: string;
 }
 
@@ -42,5 +42,14 @@ const { tone = 'navy', class: className } = Astro.props;
     background: var(--amber);
     color: var(--graphite);
     border: var(--border-amber-outline) solid var(--navy);
+  }
+
+  /* vazado para uso sobre fundo navy — creme em vez de navy, senão o contorno
+     "cream" some contra o próprio fundo (mesmo problema de contraste do navy
+     tone). Creme sobre navy: 11,76:1 (AAA). */
+  .ghost-dark {
+    background: transparent;
+    color: var(--cream);
+    border: var(--border-thin) solid var(--cream);
   }
 </style>

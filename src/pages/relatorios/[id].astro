@@ -33,12 +33,12 @@ const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
         Semana {r.edicao} · {formatarPeriodo(r.periodoInicio, r.periodoFim)}
       </span>
       <h1>{r.titulo}</h1>
-      <div class="tags">
-        {r.plataformas.map((p) => <Badge tone="cream">{p}</Badge>)}
-        {r.temas.map((t) => <Badge tone="amber">{t}</Badge>)}
-      </div>
-      <div class="actions">
+      <div class="rodape-hero">
         <Button variant="amber" href={r.pdf} download>Baixar relatório (PDF)</Button>
+        <div class="tags">
+          {r.plataformas.map((p) => <Badge tone="ghost-dark">{p}</Badge>)}
+          {r.temas.map((t) => <Badge tone="ghost-dark">{t}</Badge>)}
+        </div>
       </div>
     </div>
   </section>
@@ -113,7 +113,9 @@ const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
     /* alvo de toque ≥24px (WCAG 2.5.8) — texto sozinho media só 16px */
     padding-block: var(--space-2);
     margin-block: calc(var(--space-2) * -1) calc(var(--space-5) - var(--space-2));
-    color: var(--sky-blue);
+    /* creme, não azul-céu: 11,76:1 (AAA) — mesmo padrão já aplicado no kicker
+       da tela de Relatórios; essa tela tinha ficado de fora da revisão */
+    color: var(--cream);
     text-decoration: none;
   }
   .voltar:hover {
@@ -121,7 +123,7 @@ const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
   }
 
   .kicker {
-    color: var(--sky-blue);
+    color: var(--cream);
     display: block;
     margin-bottom: var(--space-3);
   }
@@ -131,11 +133,19 @@ const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
     margin-bottom: var(--space-5);
   }
 
+  .rodape-hero {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
   .tags {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-end;
     gap: var(--space-2);
-    margin-bottom: var(--space-6);
   }
 
   .corpo {
@@ -212,21 +222,26 @@ const textoCompartilhar = encodeURIComponent(`${r.titulo} — Brasil Online`);
 
   .link-share {
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: 0.9375rem;
     color: var(--link);
     text-decoration: none;
     background: none;
     border: none;
-    /* alvo de toque ≥24px (WCAG 2.5.8) — sem padding, media 17–20px.
-       Sem compensação de margem negativa: numa lista vertical apertada isso
-       fazia os alvos se sobreporem (testado e revertido). */
-    padding-block: var(--space-2);
+    border-radius: var(--radius);
+    /* alvo de toque ≥24px (WCAG 2.5.8). Padding nas duas direções para o hover
+       parecer um botão vazado — compensado com margem negativa horizontal
+       para o texto continuar alinhado à borda do card (mesmo truque já usado
+       em .voltar). Sem compensação vertical: numa lista apertada isso fazia
+       os alvos se sobreporem (testado e revertido antes). */
+    padding: var(--space-2) var(--space-3);
+    margin-inline: calc(var(--space-3) * -1);
     cursor: pointer;
     text-align: left;
+    transition: background var(--ease);
   }
 
   .link-share:hover {
-    text-decoration: underline;
+    background: rgba(11, 79, 158, 0.08);
   }
 
   .citacao {
