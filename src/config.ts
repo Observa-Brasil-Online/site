@@ -36,6 +36,6 @@ export const NAV = [
 export const REDES = [
   { rede: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/observa.internet/' },
   { rede: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/company/observa-conflitos-internet/' },
-  { rede: 'tiktok', label: 'TikTok', url: '' },
+  { rede: 'tiktok', label: 'TikTok', url: 'https://www.tiktok.com/@observa.internet' },
   { rede: 'x', label: 'X', url: '' },
 ] as const;
