@@ -174,6 +174,12 @@ Não entram agora; registradas para não se perder.
     mostrando a URL "errada" até a virada.
 - **Carrossel de edições anteriores na Home** — substituir o card único de "Edição anterior" por um
   carrossel quando houver acervo suficiente (Lucas, 2026-09-10).
+  - Quando for mexer nisso, aproveitar para **preencher `dados.publicacoesEsquerda/Direita`
+    retroativamente nas edições 02, 03 e 04** (Lucas, 2026-09-14) — o número já existe em cada PDF
+    ("X publicações únicas de direita contra Y de esquerda", seção 3.2), só falta extrair. Sem isso,
+    o gráfico de produção da seção "destaque" da Home só aparece nas edições 01 e 05 (as únicas com
+    o campo preenchido hoje); com todo o acervo preenchido, o carrossel pode mostrar esse dado de
+    forma consistente edição a edição.
 - **Tratamento próprio das tags de tema** nas telas de Relatórios e Relatório-detalhe — ideia do
   Lucas, a testar quando esses boards forem analisados.
 - **Estado ativo do menu com fundo preenchido** — só se o sublinhado mais grosso não bastar.

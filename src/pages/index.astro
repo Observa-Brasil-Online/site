@@ -118,20 +118,29 @@ const camadas = [
               <a href={`/relatorios/${ultima.id}`}>{semPonto(r.chamada)}</a>
             </h2>
           </div>
-          <div class="destaque-dados">
-            <StatCallout
-              value={`${r.dados?.interacoesDireita?.toLocaleString('pt-BR')}%`}
-              label={`Interações da direita, semana ${r.edicao}`}
-              legenda="ao-lado"
-            />
-            {r.dados?.interacoesEsquerda != null && r.dados?.interacoesDireita != null && (
-              <ComparisonBar
-                leftValue={r.dados.interacoesEsquerda}
-                rightValue={r.dados.interacoesDireita}
-                caption={`Interações por campo político na semana ${r.edicao}`}
-              />
-            )}
-          </div>
+          {
+            /* Interações Esquerda×Direita já aparecem no hero logo acima —
+               mostrar de novo aqui seria repetir o mesmo dado duas vezes.
+               Esta seção mostra produção de conteúdo (quem publica mais),
+               que é outra informação, sempre mencionada no texto ("Esquerda
+               lidera a produção") mas nunca visualizada. Degrada com
+               elegância: sem os campos preenchidos, some o bloco de dados e
+               fica só o texto-lead. */
+            r.dados?.publicacoesEsquerda != null && r.dados?.publicacoesDireita != null && (
+              <div class="destaque-dados">
+                <StatCallout
+                  value={`${r.dados.publicacoesEsquerda.toLocaleString('pt-BR')}%`}
+                  label={`Publicações da esquerda, semana ${r.edicao}`}
+                  legenda="ao-lado"
+                />
+                <ComparisonBar
+                  leftValue={r.dados.publicacoesEsquerda}
+                  rightValue={r.dados.publicacoesDireita}
+                  caption={`Produção de conteúdo por campo político na semana ${r.edicao}`}
+                />
+              </div>
+            )
+          }
         </div>
       </section>
     )
