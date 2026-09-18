@@ -109,7 +109,13 @@ const camadas = [
   {
     r && (
       <section class="destaque">
-        <div class="container destaque-inner">
+        <div
+          class:list={[
+            'container',
+            'destaque-inner',
+            { 'sem-dados': !(r.dados?.publicacoesEsquerda != null && r.dados?.publicacoesDireita != null) },
+          ]}
+        >
           <div class="destaque-texto">
             <span class="mono eyebrow">
               Semana {r.edicao} · {formatarPeriodo(r.periodoInicio, r.periodoFim)}
@@ -337,6 +343,29 @@ const camadas = [
   .destaque-texto h2 {
     max-width: 26ch;
     font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+  }
+
+  /* Sem o bloco de dados ao lado (edição sem publicacoesEsquerda/Direita),
+     o texto sozinho fica estranho encolhido a 320px num canto — melhor
+     ocupar a largura toda, centralizado, pra aproveitar o espaço e quebrar
+     em menos linhas. */
+  .destaque-inner.sem-dados {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .destaque-inner.sem-dados .destaque-texto {
+    flex-basis: 100%;
+  }
+
+  .destaque-inner.sem-dados .destaque-texto .eyebrow {
+    text-align: center;
+  }
+
+  .destaque-inner.sem-dados .destaque-texto h2 {
+    max-width: 46ch;
+    margin-inline: auto;
+    font-size: clamp(1.5rem, 3vw, 2rem);
   }
 
   .destaque-texto h2 a {

@@ -1,3 +1,0 @@
----
-nome: "Dr. Emmanuel Duarte"
----

@@ -1,3 +1,0 @@
----
-nome: "Gislaine Bagagi Lima"
----
