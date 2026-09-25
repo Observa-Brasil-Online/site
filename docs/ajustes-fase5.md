@@ -180,6 +180,8 @@ Não entram agora; registradas para não se perder.
     o gráfico de produção da seção "destaque" da Home só aparece nas edições 01 e 05 (as únicas com
     o campo preenchido hoje); com todo o acervo preenchido, o carrossel pode mostrar esse dado de
     forma consistente edição a edição.
+- **Ajustes de layout na versão mobile** (Lucas, 2026-09-25) — alguns layouts precisam de revisão
+  no celular; Lucas vai detalhar quais telas/seções quando for tratar o item.
 - **Tratamento próprio das tags de tema** nas telas de Relatórios e Relatório-detalhe — ideia do
   Lucas, a testar quando esses boards forem analisados.
 - **Estado ativo do menu com fundo preenchido** — só se o sublinhado mais grosso não bastar.
