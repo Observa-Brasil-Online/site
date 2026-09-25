@@ -187,8 +187,5 @@ Não entram agora; registradas para não se perder.
 - **Estado ativo do menu com fundo preenchido** — só se o sublinhado mais grosso não bastar.
 - **Painel de dados da semana no site** (fase 2 do projeto) — o schema `dados` já grava os números.
 - **CMS visual sobre o Git** para a equipe publicar edições sem tocar em código.
-- **Links de LinkedIn, TikTok e X** do projeto — pegar com a equipe e adicionar ao rodapé. Cada um
-  é uma linha em `config.ts` (Lucas, 2026-09-10). Nota: a ata de 18/08 decidiu **não** priorizar
-  TikTok, então talvez nem existam todos.
 - **Preencher `dados.plataformas`** nas edições — campo opcional; quando preenchido, a composição
   do hero ganha três blocos com as proporções reais por plataforma (números da Tabela 1 do PDF).
