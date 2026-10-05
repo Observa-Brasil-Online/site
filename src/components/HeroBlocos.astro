@@ -102,7 +102,10 @@ const temPlataformas = Array.isArray(plataformas) && plataformas.length > 0;
     flex-direction: column;
     justify-content: flex-end;
     gap: 2px;
-    min-height: 0;
+    /* o tamanho do bloco é proporcional ao dado, mas nunca menor que o
+       próprio texto — sem isso, uma plataforma com pouco volume (TikTok)
+       encolhia até cortar o nome */
+    min-height: min-content;
     overflow: hidden;
   }
 
@@ -152,10 +155,14 @@ const temPlataformas = Array.isArray(plataformas) && plataformas.length > 0;
     opacity: 0.75;
   }
 
+  /* Em telas estreitas, altura fixa não comporta três blocos de plataforma
+     legíveis (o último invadia a legenda). Altura mínima, mas cresce se o
+     conteúdo pedir. */
   @media (max-width: 860px) {
     .blocos {
-      aspect-ratio: 16 / 9;
-      max-height: 220px;
+      aspect-ratio: auto;
+      max-height: none;
+      grid-template-rows: minmax(220px, auto) auto;
     }
   }
 </style>

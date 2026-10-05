@@ -17,9 +17,6 @@ const r = ultima?.data;
 // só a edição imediatamente anterior à do hero
 const anterior = relatorios[1];
 
-// tira o ponto final: a chamada vira manchete, e manchete não leva ponto
-const semPonto = (t: string) => t.replace(/\.\s*$/, '');
-
 const camadas = [
   {
     n: '01',
@@ -107,46 +104,33 @@ const camadas = [
   }
 
   {
-    r && (
+    /* Título, chamada e interações já estão no hero acima — esta seção só
+       existe para o que é novo: produção de conteúdo (quem publica mais).
+       Semana sem esse dado no relatório = seção não aparece. */
+    r?.dados?.publicacoesEsquerda != null && r?.dados?.publicacoesDireita != null && (
       <section class="destaque">
-        <div
-          class:list={[
-            'container',
-            'destaque-inner',
-            { 'sem-dados': !(r.dados?.publicacoesEsquerda != null && r.dados?.publicacoesDireita != null) },
-          ]}
-        >
+        <div class="container destaque-inner">
           <div class="destaque-texto">
             <span class="mono eyebrow">
               Semana {r.edicao} · {formatarPeriodo(r.periodoInicio, r.periodoFim)}
             </span>
-            <h2>
-              <a href={`/relatorios/${ultima.id}`}>{semPonto(r.chamada)}</a>
-            </h2>
+            <h2>Quem publica mais</h2>
+            <p class="destaque-sub">
+              Interação mostra quem engaja; produção mostra quem ocupa o debate.
+            </p>
           </div>
-          {
-            /* Interações Esquerda×Direita já aparecem no hero logo acima —
-               mostrar de novo aqui seria repetir o mesmo dado duas vezes.
-               Esta seção mostra produção de conteúdo (quem publica mais),
-               que é outra informação, sempre mencionada no texto ("Esquerda
-               lidera a produção") mas nunca visualizada. Degrada com
-               elegância: sem os campos preenchidos, some o bloco de dados e
-               fica só o texto-lead. */
-            r.dados?.publicacoesEsquerda != null && r.dados?.publicacoesDireita != null && (
-              <div class="destaque-dados">
-                <StatCallout
-                  value={`${r.dados.publicacoesEsquerda.toLocaleString('pt-BR')}%`}
-                  label={`Publicações da esquerda, semana ${r.edicao}`}
-                  legenda="ao-lado"
-                />
-                <ComparisonBar
-                  leftValue={r.dados.publicacoesEsquerda}
-                  rightValue={r.dados.publicacoesDireita}
-                  caption={`Produção de conteúdo por campo político na semana ${r.edicao}`}
-                />
-              </div>
-            )
-          }
+          <div class="destaque-dados">
+            <StatCallout
+              value={`${r.dados.publicacoesEsquerda.toLocaleString('pt-BR')}%`}
+              label={`Publicações da esquerda, semana ${r.edicao}`}
+              legenda="ao-lado"
+            />
+            <ComparisonBar
+              leftValue={r.dados.publicacoesEsquerda}
+              rightValue={r.dados.publicacoesDireita}
+              caption={`Produção de conteúdo por campo político na semana ${r.edicao}`}
+            />
+          </div>
         </div>
       </section>
     )
@@ -345,37 +329,11 @@ const camadas = [
     font-size: clamp(1.375rem, 2.5vw, 1.75rem);
   }
 
-  /* Sem o bloco de dados ao lado (edição sem publicacoesEsquerda/Direita),
-     o texto sozinho fica estranho encolhido a 320px num canto — melhor
-     ocupar a largura toda, centralizado, pra aproveitar o espaço e quebrar
-     em menos linhas. */
-  .destaque-inner.sem-dados {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .destaque-inner.sem-dados .destaque-texto {
-    flex-basis: 100%;
-  }
-
-  .destaque-inner.sem-dados .destaque-texto .eyebrow {
-    text-align: center;
-  }
-
-  .destaque-inner.sem-dados .destaque-texto h2 {
-    max-width: 46ch;
-    margin-inline: auto;
-    font-size: clamp(1.5rem, 3vw, 2rem);
-  }
-
-  .destaque-texto h2 a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .destaque-texto h2 a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+  .destaque-sub {
+    margin-top: var(--space-3);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--graphite);
   }
 
   .destaque-dados {
