@@ -161,6 +161,29 @@ Direção vinda dos prints de referência (Realtime Colors). Aprovados com as co
 
 Não entram agora; registradas para não se perder.
 
+- **Segurança do site e da conta** (Lucas, 2026-10-13) — aguardando Lucas verificar dados e
+  definir com o time do OBSERVA como fica o domínio. Contexto: o site é estático (sem banco, login
+  ou formulário), então o risco está na **conta**, não no código; DDoS já é barrado pelo Cloudflare
+  no plano grátis. Hoje o site vive numa conta Cloudflare pessoal do Lucas e o endereço
+  `workers.dev` expõe o usuário do e-mail dele. Etapas, por prioridade:
+  1. **Contas pessoais (só o Lucas faz):** ativar 2FA no Cloudflare e no GitHub; no GitHub,
+     Settings → Emails → "Keep my email address private" (commits futuros deixam de mostrar o
+     e-mail pessoal; os antigos continuam).
+  2. **Segundo administrador** na conta Cloudflare (Manage Account → Members), de preferência o
+     Prof. Claudio — o site não pode depender de uma pessoa só.
+  3. **Conta institucional:** na virada para `labobserva.pesquisa.ufabc.edu.br`, transferir o
+     projeto para uma conta Cloudflare institucional (ou criada com e-mail do OBSERVA) e decidir
+     o destino do `workers.dev` (redirecionar ou desativar). Ver o item de divulgação abaixo.
+  4. **No repositório:**
+     - `SECURITY.md` — política de como reportar vulnerabilidade, com **e-mail institucional**
+       (sugestão: `claudio.penteado@ufabc.edu.br` ou um e-mail do OBSERVA), nunca o pessoal.
+       Não protege nada por si só; só orienta quem encontrar uma falha.
+     - `public/_headers` — cabeçalhos de segurança aplicados pelo Cloudflare: impedir que o site
+       seja embutido em outras páginas (`X-Frame-Options`/`frame-ancestors`), `X-Content-Type-Options`,
+       `Referrer-Policy`, `Permissions-Policy` e uma `Content-Security-Policy` restringindo a
+       origem dos scripts. **Se entrar ferramenta de analytics, a CSP precisa liberar o domínio
+       dela** — fazer os dois itens juntos ou na ordem certa.
+
 - **Divulgação com o link do `workers.dev` até o domínio da UFABC resolver** (Lucas, 2026-09-10):
   ok divulgar publicamente com `https://site-observa.lucas360oliveira23.workers.dev` desde já —
   quando `labobserva.pesquisa.ufabc.edu.br` for liberado, ele entra como Custom Domain no painel
